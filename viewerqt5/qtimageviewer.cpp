@@ -78,7 +78,10 @@ void QtImageViewer::createActions(){
 	connect(_quitAction, SIGNAL(triggered()), this, SLOT(quit()));
 
 	_toolsFourierTransform = new QAction(tr("&Fourier transform..."), this);
-	_toolsFourierTransform->setShortcut(QKeySequence::Open);
+	_toolsFourierTransform->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_P));
+
+	_toolsCombine = new QAction(tr("&Combine images into RGB..."), this);
+	_toolsCombine->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_C));
 
 	_fileMenu = menuBar()->addMenu(tr("&File"));
 	_fileMenu->addAction(_fileOpenAction);
@@ -86,6 +89,7 @@ void QtImageViewer::createActions(){
 
 	_toolsMenu = menuBar()->addMenu(tr("&Tools"));
 	_toolsMenu->addAction(_toolsFourierTransform);
+	_toolsMenu->addAction(_toolsCombine);
 }
 
 void QtImageViewer::openFile(){

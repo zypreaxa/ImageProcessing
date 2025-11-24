@@ -65,6 +65,7 @@ private:
 
 	QMenu *_toolsMenu{nullptr};
 	QAction *_toolsFourierTransform{nullptr};
+	QAction *_toolsCombine{nullptr};
 	
 };
 
