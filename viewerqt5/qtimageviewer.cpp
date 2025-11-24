@@ -77,9 +77,15 @@ void QtImageViewer::createActions(){
 	_quitAction->setShortcut(QKeySequence::Quit);
 	connect(_quitAction, SIGNAL(triggered()), this, SLOT(quit()));
 
+	_toolsFourierTransform = new QAction(tr("&Fourier transform..."), this);
+	_toolsFourierTransform->setShortcut(QKeySequence::Open);
+
 	_fileMenu = menuBar()->addMenu(tr("&File"));
 	_fileMenu->addAction(_fileOpenAction);
 	_fileMenu->addAction(_quitAction);
+
+	_toolsMenu = menuBar()->addMenu(tr("&Tools"));
+	_toolsMenu->addAction(_toolsFourierTransform);
 }
 
 void QtImageViewer::openFile(){

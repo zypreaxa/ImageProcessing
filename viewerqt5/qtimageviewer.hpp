@@ -62,6 +62,9 @@ private:
 	QMenu *_fileMenu{nullptr};
 	QAction *_fileOpenAction{nullptr};
 	QAction *_quitAction{nullptr};
+
+	QMenu *_toolsMenu{nullptr};
+	QAction *_toolsFourierTransform{nullptr};
 	
 };
 
