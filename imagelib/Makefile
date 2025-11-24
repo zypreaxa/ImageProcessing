@@ -16,8 +16,11 @@ tiffloader.o: imageloader.o tiffloader.hpp tiffloader.cpp
 jpegloader.o: image.o jpegloader.hpp jpegloader.cpp
 	g++ -fPIC -O2 jpegloader.cpp -c
 
-$(TARGET): image.o imageloader.o tiffloader.o jpegloader.o
-	g++ -shared image.o imageloader.o tiffloader.o jpegloader.o -o $(TARGET)
+imageprocessor.o: imageprocessor.o imageprocessor.hpp imageprocessor.cpp
+	g++ -fPIC -O2 imageprocessor.cpp -c
+
+$(TARGET): image.o imageloader.o tiffloader.o jpegloader.o imageprocessor.o
+	g++ -shared image.o imageloader.o tiffloader.o jpegloader.o imageprocessor.o -o $(TARGET)
 
 clean:
 	rm *.o;
