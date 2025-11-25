@@ -23,12 +23,15 @@ public:
 	QtImageViewer(const QString filename, QWidget *parent=nullptr);
 	
 	virtual ~QtImageViewer();
+
+	void setBuffImg(QImage img);
 			  
 public slots:
 	//void showFile(const QString filename);
 	void showImageLeft(Image *img);
 	void showImageRight(Image *img);
 	void openFile();
+	void saveFile();
 	void quit();
 	void combineImagesRGB();
 private:
@@ -46,6 +49,8 @@ private:
 
 	unsigned int _imageState{ImageView::NONE};
 
+	QImage _buffimg;
+
 	void showImage(Image* img, ImageView view);
 	
 	QImage _lImage;
@@ -62,7 +67,9 @@ private:
 	
 	QMenu *_fileMenu{nullptr};
 	QAction *_fileOpenAction{nullptr};
+	QAction *_fileSaveAction{nullptr};
 	QAction *_quitAction{nullptr};
+	
 
 	QMenu *_toolsMenu{nullptr};
 	QAction *_toolsFourierTransform{nullptr};

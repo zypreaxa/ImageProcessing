@@ -73,6 +73,10 @@ void QtImageViewer::createActions(){
 	_fileOpenAction = new QAction(tr("&Open..."), this);
 	_fileOpenAction->setShortcut(QKeySequence::Open);
 	connect(_fileOpenAction, SIGNAL(triggered()), this, SLOT(openFile()));
+	
+	_fileSaveAction = new QAction(tr("&Save file..."), this);
+	_fileSaveAction->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_S));
+	connect(_fileSaveAction, SIGNAL(triggered()), this, SLOT(saveFile()));
 
 	_quitAction = new QAction(tr("&Quit..."), this);
 	_quitAction->setShortcut(QKeySequence::Quit);
@@ -87,6 +91,7 @@ void QtImageViewer::createActions(){
 
 	_fileMenu = menuBar()->addMenu(tr("&File"));
 	_fileMenu->addAction(_fileOpenAction);
+	_fileMenu->addAction(_fileSaveAction);
 	_fileMenu->addAction(_quitAction);
 
 	_toolsMenu = menuBar()->addMenu(tr("&Tools"));
@@ -231,10 +236,13 @@ void QtImageViewer::showImageRight(Image *img) {
 	showImage(img, ImageView::RIGHT);
 }
 
+void QtImageViewer::setBuffImg(QImage img) {
+	_buffimg = img;
+}
+
 void QtImageViewer::combineImagesRGB() {
     ImageProcessor processor;
 
-    // --- Step 1: Ask user for three images ---
     QString redFile   = QFileDialog::getOpenFileName(this, "Select RED channel TIFF");
     if(redFile.isEmpty()) return;
 
@@ -244,7 +252,6 @@ void QtImageViewer::combineImagesRGB() {
     QString blueFile  = QFileDialog::getOpenFileName(this, "Select BLUE channel TIFF");
     if(blueFile.isEmpty()) return;
 
-    // --- Step 2: Load all three TIFF files ---
     TiffLoader redLoader(redFile.toStdString());
     Image* red = redLoader.loadImage();
 
@@ -259,7 +266,6 @@ void QtImageViewer::combineImagesRGB() {
         return;
     }
 
-    // --- Step 3: Combine them into RGB ---
     Image* rgb = processor.combineRGB(red, green, blue);
 
     if(!rgb) {
@@ -267,15 +273,27 @@ void QtImageViewer::combineImagesRGB() {
         return;
     }
 
-    // --- Step 4: Show result on the RIGHT panel ---
     showImageRight(rgb);
-
-    // --- Step 5: Cleanup ---
+	QString filename = QFileDialog::getSaveFileName(this, "Save as...");
+	if(!filename.isEmpty()) {
+		QImage image (
+			rgb->getImageData(),
+			rgb->getWidth(),
+			rgb->getHeight(),
+			rgb->getWidth() * 3,
+			QImage::Format_RGB888
+		);
+		QImage copy = image.copy();
+		QtImageViewer::setBuffImg(copy);
+	}
+  
     delete red;
     delete green;
     delete blue;
-    delete rgb;
+	delete rgb;
 }
+
+
 
 void QtImageViewer::quit(){
 	close();
