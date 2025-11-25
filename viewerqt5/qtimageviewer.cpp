@@ -12,6 +12,7 @@
 #include <QValueAxis>
 
 #include <tiffloader.hpp> /// include your image loader
+#include <imageprocessor.hpp> // including image processor
 
 #include <iostream>
 
@@ -82,6 +83,7 @@ void QtImageViewer::createActions(){
 
 	_toolsCombine = new QAction(tr("&Combine images into RGB..."), this);
 	_toolsCombine->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_C));
+	connect(_toolsCombine, SIGNAL(triggered()), this, SLOT(combineImagesRGB()));
 
 	_fileMenu = menuBar()->addMenu(tr("&File"));
 	_fileMenu->addAction(_fileOpenAction);
@@ -227,6 +229,52 @@ void QtImageViewer::showImageLeft(Image *img) {
 
 void QtImageViewer::showImageRight(Image *img) {
 	showImage(img, ImageView::RIGHT);
+}
+
+void QtImageViewer::combineImagesRGB() {
+    ImageProcessor processor;
+
+    // --- Step 1: Ask user for three images ---
+    QString redFile   = QFileDialog::getOpenFileName(this, "Select RED channel TIFF");
+    if(redFile.isEmpty()) return;
+
+    QString greenFile = QFileDialog::getOpenFileName(this, "Select GREEN channel TIFF");
+    if(greenFile.isEmpty()) return;
+
+    QString blueFile  = QFileDialog::getOpenFileName(this, "Select BLUE channel TIFF");
+    if(blueFile.isEmpty()) return;
+
+    // --- Step 2: Load all three TIFF files ---
+    TiffLoader redLoader(redFile.toStdString());
+    Image* red = redLoader.loadImage();
+
+    TiffLoader greenLoader(greenFile.toStdString());
+    Image* green = greenLoader.loadImage();
+
+    TiffLoader blueLoader(blueFile.toStdString());
+    Image* blue = blueLoader.loadImage();
+
+    if(!red || !green || !blue) {
+        std::cout << "Failed to load one of the images." << std::endl;
+        return;
+    }
+
+    // --- Step 3: Combine them into RGB ---
+    Image* rgb = processor.combineRGB(red, green, blue);
+
+    if(!rgb) {
+        std::cout << "RGB combination failed." << std::endl;
+        return;
+    }
+
+    // --- Step 4: Show result on the RIGHT panel ---
+    showImageRight(rgb);
+
+    // --- Step 5: Cleanup ---
+    delete red;
+    delete green;
+    delete blue;
+    delete rgb;
 }
 
 void QtImageViewer::quit(){

@@ -18,7 +18,7 @@ public:
 	virtual ~Image();
 
 	// File related
-	//virtual bool openFile() = 0;
+	//virtual bool openFile() = 0; 
 
 	// Get attributes
 	unsigned long getWidth();

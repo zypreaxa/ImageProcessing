@@ -30,6 +30,7 @@ public slots:
 	void showImageRight(Image *img);
 	void openFile();
 	void quit();
+	void combineImagesRGB();
 private:
 	enum ImageView{
 		NONE = 0,

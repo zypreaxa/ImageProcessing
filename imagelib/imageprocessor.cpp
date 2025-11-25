@@ -13,8 +13,8 @@ Image* ImageProcessor::combineRGB(
 
     unsigned long width = red->getWidth();
     unsigned long height = red->getHeight();
-    unsigned long channels = red->getChannels();
     unsigned long bpc = red->getBpc(); // this assumes that all 3 images are the same size
+    unsigned long channels = 3;
 
     unsigned char* data = new unsigned char [width * height * channels * (bpc/8)];
     

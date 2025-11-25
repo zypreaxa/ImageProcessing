@@ -234,7 +234,8 @@ debug/viewer.o: viewer.cpp qtimageviewer.hpp \
 debug/qtimageviewer.o: qtimageviewer.cpp qtimageviewer.hpp \
 		../imagelib/image.hpp \
 		../imagelib/tiffloader.hpp \
-		../imagelib/imageloader.hpp
+		../imagelib/imageloader.hpp \
+		../imagelib/imageprocessor.hpp
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o debug/qtimageviewer.o qtimageviewer.cpp
 
 debug/moc_qtimageviewer.o: debug/moc_qtimageviewer.cpp 
