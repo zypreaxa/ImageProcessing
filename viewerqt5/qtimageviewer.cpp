@@ -74,10 +74,6 @@ void QtImageViewer::createActions(){
 	_fileOpenAction->setShortcut(QKeySequence::Open);
 	connect(_fileOpenAction, SIGNAL(triggered()), this, SLOT(openFile()));
 	
-	_fileSaveAction = new QAction(tr("&Save file..."), this);
-	_fileSaveAction->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_S));
-	connect(_fileSaveAction, SIGNAL(triggered()), this, SLOT(saveFile()));
-
 	_quitAction = new QAction(tr("&Quit..."), this);
 	_quitAction->setShortcut(QKeySequence::Quit);
 	connect(_quitAction, SIGNAL(triggered()), this, SLOT(quit()));
@@ -91,7 +87,6 @@ void QtImageViewer::createActions(){
 
 	_fileMenu = menuBar()->addMenu(tr("&File"));
 	_fileMenu->addAction(_fileOpenAction);
-	_fileMenu->addAction(_fileSaveAction);
 	_fileMenu->addAction(_quitAction);
 
 	_toolsMenu = menuBar()->addMenu(tr("&Tools"));
@@ -236,10 +231,6 @@ void QtImageViewer::showImageRight(Image *img) {
 	showImage(img, ImageView::RIGHT);
 }
 
-void QtImageViewer::setBuffImg(QImage img) {
-	_buffimg = img;
-}
-
 void QtImageViewer::combineImagesRGB() {
     ImageProcessor processor;
 
@@ -284,7 +275,7 @@ void QtImageViewer::combineImagesRGB() {
 			QImage::Format_RGB888
 		);
 		QImage copy = image.copy();
-		QtImageViewer::setBuffImg(copy);
+		copy.save(filename);
 	}
   
     delete red;
