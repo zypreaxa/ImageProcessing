@@ -23,14 +23,13 @@ public:
 	QtImageViewer(const QString filename, QWidget *parent=nullptr);
 	
 	virtual ~QtImageViewer();
-
-	void setBuffImg(QImage img);
 			  
 public slots:
 	//void showFile(const QString filename);
 	void showImageLeft(Image *img);
 	void showImageRight(Image *img);
 	void openFile();
+	void clearFile();
 	void quit();
 	void combineImagesRGB();
 private:
@@ -64,6 +63,7 @@ private:
 	
 	QMenu *_fileMenu{nullptr};
 	QAction *_fileOpenAction{nullptr};
+	QAction *_fileClearAction{nullptr};
 	QAction *_quitAction{nullptr};
 	
 

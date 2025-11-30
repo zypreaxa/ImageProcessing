@@ -65,6 +65,7 @@ QtImageViewer::~QtImageViewer(){
 	delete(_rScrollArea);
 	delete(_fileMenu);
 	delete(_fileOpenAction);
+	delete(_fileClearAction);
 	delete(_quitAction);
 };
 
@@ -73,6 +74,10 @@ void QtImageViewer::createActions(){
 	_fileOpenAction = new QAction(tr("&Open..."), this);
 	_fileOpenAction->setShortcut(QKeySequence::Open);
 	connect(_fileOpenAction, SIGNAL(triggered()), this, SLOT(openFile()));
+
+	_fileClearAction = new QAction(tr("&Clear display..."), this);
+	_fileClearAction->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_Delete));
+	connect(_fileClearAction, SIGNAL(triggered()), this, SLOT(clearFile()));
 	
 	_quitAction = new QAction(tr("&Quit..."), this);
 	_quitAction->setShortcut(QKeySequence::Quit);
@@ -87,6 +92,7 @@ void QtImageViewer::createActions(){
 
 	_fileMenu = menuBar()->addMenu(tr("&File"));
 	_fileMenu->addAction(_fileOpenAction);
+	_fileMenu->addAction(_fileClearAction);
 	_fileMenu->addAction(_quitAction);
 
 	_toolsMenu = menuBar()->addMenu(tr("&Tools"));
@@ -229,6 +235,10 @@ void QtImageViewer::showImageLeft(Image *img) {
 
 void QtImageViewer::showImageRight(Image *img) {
 	showImage(img, ImageView::RIGHT);
+}
+
+void QtImageViewer::clearFile() {
+	std::cout << "yadda yadda"; // the clear function goes here, everything else works :D
 }
 
 void QtImageViewer::combineImagesRGB() {
