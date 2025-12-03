@@ -21,7 +21,7 @@ QtImageViewer::QtImageViewer(QWidget *parent) :
   init();
 };
 
-void  QtImageViewer::init(){
+void QtImageViewer::init(){
 
 
 	_lImageLabel = new QLabel;
@@ -238,8 +238,17 @@ void QtImageViewer::showImageRight(Image *img) {
 }
 
 void QtImageViewer::clearFile() {
-	std::cout << "yadda yadda"; // the clear function goes here, everything else works :D
+
+	_lImageLabel->clear();
+	_lScrollArea->setVisible(false);
+
+	_rImageLabel->clear();
+	_rScrollArea->setVisible(false);
+	_imageState = 0;
+
+	update();
 }
+
 
 void QtImageViewer::combineImagesRGB() {
     ImageProcessor processor;
