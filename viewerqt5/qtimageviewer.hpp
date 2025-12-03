@@ -32,6 +32,7 @@ public slots:
 	void clearFile();
 	void quit();
 	void combineImagesRGB();
+	void negate();
 private:
 	enum ImageView{
 		NONE = 0,
@@ -70,6 +71,7 @@ private:
 	QMenu *_toolsMenu{nullptr};
 	QAction *_toolsFourierTransform{nullptr};
 	QAction *_toolsCombine{nullptr};
+	QAction *_toolsNegate{nullptr};
 	
 };
 

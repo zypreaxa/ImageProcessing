@@ -89,6 +89,10 @@ void QtImageViewer::createActions(){
 	_toolsCombine = new QAction(tr("&Combine images into RGB..."), this);
 	_toolsCombine->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_C));
 	connect(_toolsCombine, SIGNAL(triggered()), this, SLOT(combineImagesRGB()));
+	
+	_toolsNegate = new QAction(tr("Image negation..."), this);
+	_toolsNegate->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_N));
+	connect(_toolsNegate, SIGNAL(triggered()), this, SLOT(negate()));
 
 	_fileMenu = menuBar()->addMenu(tr("&File"));
 	_fileMenu->addAction(_fileOpenAction);
@@ -98,6 +102,7 @@ void QtImageViewer::createActions(){
 	_toolsMenu = menuBar()->addMenu(tr("&Tools"));
 	_toolsMenu->addAction(_toolsFourierTransform);
 	_toolsMenu->addAction(_toolsCombine);
+	_toolsMenu->addAction(_toolsNegate);
 }
 
 void QtImageViewer::openFile(){
@@ -301,6 +306,20 @@ void QtImageViewer::combineImagesRGB() {
     delete green;
     delete blue;
 	delete rgb;
+}
+
+void QtImageViewer::negate() {
+	ImageProcessor processor;
+	QString filename = QFileDialog::getOpenFileName(this, "Select Image for transformation...");
+    if(filename.isEmpty()) return;
+	
+	TiffLoader trloader = (filename.toStdString());
+	Image* img = trloader.loadImage();
+
+	processor.negationtr(img);
+	showImageRight(img);
+
+	delete img;
 }
 
 

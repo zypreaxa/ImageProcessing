@@ -8,10 +8,17 @@ class Image;
 
 class ImageProcessor {
 public: 
+
     static Image* combineRGB(
         Image* red,
         Image* green,
-        Image* blue);
+        Image* blue
+    );
+    
+    static Image* negationtr(
+        Image* in
+    );
+     
 };
 
 #endif

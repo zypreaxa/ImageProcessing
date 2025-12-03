@@ -3,6 +3,11 @@
 
 #include <string>
 #include <vector>
+#include <cstdint>
+
+struct Pixel{
+		uint8_t r, g, b;
+	};
 
 class Image{
 public:
@@ -30,6 +35,22 @@ public:
 	unsigned char* getImageData();
 
 	// get/set Pixel methods?
+	
+	Pixel getPixel(int x, int y) const {
+		int idx = (y * _width + x) * _channels;
+		Pixel p;
+		p.r = _data[idx];
+		p.g = _data[idx+1];
+		p.b = _data[idx+2];
+		return p;
+	};
+	void setPixel(int x, int y, Pixel& p){
+		int idx = (y * _width + x) * _channels;
+		_data[idx] = p.r;
+		_data[idx+1] = p.g;
+		_data[idx+2] = p.b;
+	}
+
 
 	// histogram - here using a std::vector
 	std::vector<unsigned int> getHistogram();

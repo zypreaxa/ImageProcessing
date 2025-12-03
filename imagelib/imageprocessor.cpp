@@ -1,5 +1,6 @@
 #include "imageprocessor.hpp"
 #include <algorithm>
+#include <iostream>
 
 Image* ImageProcessor::combineRGB(
     Image* red,
@@ -29,5 +30,43 @@ Image* ImageProcessor::combineRGB(
 
     Image* out = new Image(width, height, channels, bpc, data);
     return out;
+};
+
+Image* ImageProcessor::negationtr(Image* img){
+    size_t width = img->getWidth();
+    size_t height = img->getHeight();
+    unsigned long channels = img->getChannels();
+    unsigned long bpc = img->getBpc();
+
+    if(channels==1){ // if image is greyscale
+        std::cout << "Inverting greyscale image...\n";
+
+        for(size_t y=0; y<height; ++y){
+            for(size_t x=0; x<width; ++x){
+                Pixel p = img->getPixel(x, y);
+                p.r = 255 - p.r; // since red has the first index, it is the representation of grey in greyscale
+
+                img->setPixel(x, y, p);            
+            }
+        }
+        return img;
+
+    }
+    else if(channels=3){ // if simple 3 channel RGB
+        std::cout << "Inverting RGB image...\n";
+        
+        for(size_t y=0; y<height; y++){
+            for(size_t x=0; x<width; x++){
+                Pixel p = img->getPixel(x, y);
+                p.r = 255 - p.r;
+                p.g = 255 - p.g;
+                p.b = 255 - p.b;
+                
+                img->setPixel(x, y, p);
+            }
+        }
+        return img;
+    }
+
 }
 
