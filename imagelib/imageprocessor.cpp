@@ -68,5 +68,43 @@ Image* ImageProcessor::negationtr(Image* img){
         return img;
     }
 
-}
+};
+
+Image* ImageProcessor::powerlawtr(Image* img){
+    unsigned long width = img->getWidth();
+    unsigned long height = img->getHeight();
+    unsigned long channels = img->getChannels(); // supposed to be mainly greyscale, but might as well
+    unsigned long bpc = img->getBpc();
+    int gamma;
+    std::cout << "Select gamma value: ";
+    std::cin >> gamma;
+
+    if(channels==1){
+        for(int y=0; y<height; y++){
+            for(int x=0; x<width; x++){
+                Pixel p = img->getPixel(x, y);
+                p.r = p.r ^ gamma;
+                img->setPixel(x, y, p);
+            }
+        }
+        return img;
+    }
+    else if(channels==3){
+        for(int y=0; y<height; y++){
+            for(int x=0; x<width; x++){
+                Pixel p = img->getPixel(x, y);
+                p.r = p.r ^ gamma;
+                p.g = p.g ^ gamma;
+                p.b = p.b ^ gamma;
+                img->setPixel(x, y, p);
+            }
+        }
+        return img;
+    }
+    else {
+        std::cout << "Image is of unknown format.";
+        return nullptr;
+    }
+};
+    
 

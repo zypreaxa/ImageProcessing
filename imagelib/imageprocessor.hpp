@@ -15,9 +15,8 @@ public:
         Image* blue
     );
     
-    static Image* negationtr(
-        Image* in
-    );
+    static Image* negationtr(Image* img);
+    static Image* powerlawtr(Image* img);
      
 };
 

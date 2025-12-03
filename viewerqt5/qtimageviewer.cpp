@@ -84,7 +84,7 @@ void QtImageViewer::createActions(){
 	connect(_quitAction, SIGNAL(triggered()), this, SLOT(quit()));
 
 	_toolsFourierTransform = new QAction(tr("&Fourier transform..."), this);
-	_toolsFourierTransform->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_P));
+	_toolsFourierTransform->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_F));
 
 	_toolsCombine = new QAction(tr("&Combine images into RGB..."), this);
 	_toolsCombine->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_C));
@@ -93,6 +93,10 @@ void QtImageViewer::createActions(){
 	_toolsNegate = new QAction(tr("Image negation..."), this);
 	_toolsNegate->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_N));
 	connect(_toolsNegate, SIGNAL(triggered()), this, SLOT(negate()));
+
+	_toolsPowerlaw = new QAction(tr("Power law..."), this);
+	_toolsPowerlaw->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_P));
+	connect(_toolsPowerlaw, SIGNAL(triggered()), this, SLOT(powerlaw()));
 
 	_fileMenu = menuBar()->addMenu(tr("&File"));
 	_fileMenu->addAction(_fileOpenAction);
@@ -103,6 +107,7 @@ void QtImageViewer::createActions(){
 	_toolsMenu->addAction(_toolsFourierTransform);
 	_toolsMenu->addAction(_toolsCombine);
 	_toolsMenu->addAction(_toolsNegate);
+	_toolsMenu->addAction(_toolsPowerlaw);
 }
 
 void QtImageViewer::openFile(){
@@ -317,6 +322,20 @@ void QtImageViewer::negate() {
 	Image* img = trloader.loadImage();
 
 	processor.negationtr(img);
+	showImageRight(img);
+
+	delete img;
+}
+
+void QtImageViewer::powerlaw(){
+	ImageProcessor processor;
+	QString filename = QFileDialog::getOpenFileName(this, "Select image for transformation...");
+	if(filename.isEmpty()) return;
+
+	TiffLoader trloader = (filename.toStdString());
+	Image* img = trloader.loadImage();
+
+	processor.powerlawtr(img);
 	showImageRight(img);
 
 	delete img;

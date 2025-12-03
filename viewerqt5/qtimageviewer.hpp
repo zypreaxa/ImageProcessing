@@ -33,6 +33,7 @@ public slots:
 	void quit();
 	void combineImagesRGB();
 	void negate();
+	void powerlaw();
 private:
 	enum ImageView{
 		NONE = 0,
@@ -72,6 +73,7 @@ private:
 	QAction *_toolsFourierTransform{nullptr};
 	QAction *_toolsCombine{nullptr};
 	QAction *_toolsNegate{nullptr};
+	QAction *_toolsPowerlaw{nullptr};
 	
 };
 
