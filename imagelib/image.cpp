@@ -16,9 +16,21 @@ unsigned char* Image::getImageData(){
      return _data;
 };
 
-std::vector<unsigned int> Image::getHistogram(){
-	return std::vector<unsigned int>(256,0);
-}
+std::vector<unsigned int> Image::getHistogram()
+{
+    std::vector<unsigned int> histogram(256, 0);
+
+    for (unsigned long y = 0; y < _length; ++y) {
+        for (unsigned long x = 0; x < _width; ++x) {
+
+            int idx = (y * _width + x);
+            Pixel p = getPixel(x, y);
+
+            histogram[p.r]++;
+        }
+    }
+    return histogram;
+};
 
 unsigned long Image::getWidth() {return _width;};
 unsigned long Image::getHeight() { return _length;};
