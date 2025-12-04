@@ -35,6 +35,7 @@ public slots:
 	void negate();
 	void powerlaw();
 	void linear();
+	void thresholding();
 private:
 	enum ImageView{
 		NONE = 0,
@@ -76,6 +77,7 @@ private:
 	QAction *_toolsNegate{nullptr};
 	QAction *_toolsPowerlaw{nullptr};
 	QAction *_toolsLinear{nullptr};
+	QAction *_toolsThresholding{nullptr};
 	
 };
 

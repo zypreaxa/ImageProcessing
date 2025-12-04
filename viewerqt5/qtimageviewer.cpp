@@ -102,6 +102,10 @@ void QtImageViewer::createActions(){
 	_toolsLinear->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_L));
 	connect(_toolsLinear, SIGNAL(triggered()), this, SLOT(linear()));
 
+	_toolsThresholding = new QAction(tr("Thresholding..."), this);
+	_toolsThresholding->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_T));
+	connect(_toolsThresholding, SIGNAL(triggered()), this, SLOT(thresholding()));
+
 	_fileMenu = menuBar()->addMenu(tr("&File"));
 	_fileMenu->addAction(_fileOpenAction);
 	_fileMenu->addAction(_fileClearAction);
@@ -113,6 +117,7 @@ void QtImageViewer::createActions(){
 	_toolsMenu->addAction(_toolsNegate);
 	_toolsMenu->addAction(_toolsPowerlaw);
 	_toolsMenu->addAction(_toolsLinear);
+	_toolsMenu->addAction(_toolsThresholding);
 };
 
 void QtImageViewer::openFile(){
@@ -355,6 +360,19 @@ void QtImageViewer::linear(){
 	Image* img = trloader.loadImage();
 
 	processor.lineartr(img);
+	showImageRight(img);
+	delete img;
+};
+
+void QtImageViewer::thresholding(){
+	ImageProcessor processor;
+	QString filename = QFileDialog::getOpenFileName(this, "Select image for thresholding...");
+	if(filename.isEmpty()) return;
+	
+	TiffLoader trloader = (filename.toStdString());
+	Image* img = trloader.loadImage();
+
+	processor.thresholdtr(img);
 	showImageRight(img);
 	delete img;
 };

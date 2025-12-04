@@ -1,5 +1,6 @@
 #include "imageprocessor.hpp"
 #include <algorithm>
+#include <cmath>
 #include <iostream>
 
 Image* ImageProcessor::combineRGB(
@@ -83,13 +84,13 @@ Image* ImageProcessor::powerlawtr(Image* img){
         for(int y=0; y<height; y++){
             for(int x=0; x<width; x++){
                 Pixel p = img->getPixel(x, y);
-                p.r = p.r ^ gamma;
+                p.r = 255.0 * std::pow(p.r / 255.0, gamma);
                 img->setPixel(x, y, p);
             }
         }
         return img;
     }
-    else if(channels==3){
+    else if(channels==3){  // completely incorrect lol
         for(int y=0; y<height; y++){
             for(int x=0; x<width; x++){
                 Pixel p = img->getPixel(x, y);
@@ -111,28 +112,84 @@ Image* ImageProcessor::lineartr(Image* img) {
     unsigned long width = img->getWidth();
     unsigned long height = img->getHeight();
     unsigned long channels = img->getChannels();
-    unsigned long bpc = img->getBpc();  
 
-    if(channels==1){
-        for(int y=0; y<height; y++){
-            for(int x=0; x<width; x++){
+    double L = 255.0;
+    double r1 = 3.0 * L / 8.0;
+    double s1 = L / 8.0;
+    double r2 = 5.0 * L / 8.0;
+    double s2 = 7.0 * L / 8.0;
+
+    if (channels == 1) {
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+
                 Pixel p = img->getPixel(x, y);
-                if(0<=p.r<100){
-                    p.r = 1/2*p.r;
+                double r = p.r;
+                double s;
+
+                if (r <= r1) {
+                    s = (s1 / r1) * r;
                 }
-                else if(100<=p.r<200){
-                    p.r=50+(170/100)*(p.r-100);
+                else if (r <= r2) {
+                    double m = (s2 - s1) / (r2 - r1);
+                    s = m * (r - r1) + s1;
                 }
-                else{
-                    p.r = 220+(35/55)*(p.r-200);
+                else {
+                    double m = (L - 1 - s2) / (L - 1 - r2);
+                    s = m * (r - r2) + s2;
                 }
+
+                // Clamp
+                s = std::clamp(s, 0.0, 255.0);
+                p.r = (unsigned char)s;
                 img->setPixel(x, y, p);
             }
         }
         return img;
     }
-    else return nullptr;
+    else {
+        std::cout << "This format cannot be transformed yet. Please choose a greyscale image." << std::endl;
+        return nullptr;
+    }
+}
 
+Image* ImageProcessor::thresholdtr(Image* img){
+    unsigned long width, height, channels;
+    width = img->getWidth();
+    height = img->getHeight();
+    channels = img->getChannels();
+
+    int L, r0, s0, r1, s1, r2, s2, r3, s3, newval;
+    L=256;
+    r0=0; s0=r0;
+    r1=L/2; s1=0;
+    r2=r1; s2=L-1;
+    r3=s2; s3=s2;
+
+    if(channels==1){
+        for(int y=0; y<height; y++){
+            for(int x=0; x<width; x++){
+                Pixel p = img->getPixel(x, y);
+                if(p.r <= r1){
+                    newval=s0+((s1-s0)/(r1-r0))*(p.r - r0);
+                } 
+                else if(p.r <= r2){
+                    newval=s1+((s2-s1)/(r2-r1))*(p.r - r1);
+                }
+                else{
+                    newval=s3+((s3-s2)/(r3-r2))*(p.r - r2);
+                }
+                std::clamp(newval, 0, 255);
+                p.r = (unsigned char) newval;
+                img->setPixel(x, y, p);
+            }
+        }
+        return img;
+    }
+    else{
+        std::cout << "This format cannot be transformed yet. Please choose a greyscale image." << std::endl;
+        return nullptr;
+    }
 }
     
 
