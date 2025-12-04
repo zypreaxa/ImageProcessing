@@ -17,6 +17,7 @@ public:
     
     static Image* negationtr(Image* img);
     static Image* powerlawtr(Image* img);
+    static Image* lineartr(Image* img);
      
 };
 

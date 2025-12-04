@@ -56,7 +56,7 @@ void QtImageViewer::init(){
 
 	setCentralWidget(_mainSplitter);
 	createActions();
-}
+};
 
 QtImageViewer::~QtImageViewer(){
 	delete(_lImageLabel);
@@ -98,6 +98,10 @@ void QtImageViewer::createActions(){
 	_toolsPowerlaw->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_P));
 	connect(_toolsPowerlaw, SIGNAL(triggered()), this, SLOT(powerlaw()));
 
+	_toolsLinear = new QAction(tr("Piece-wise linear..."), this);
+	_toolsLinear->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_L));
+	connect(_toolsLinear, SIGNAL(triggered()), this, SLOT(linear()));
+
 	_fileMenu = menuBar()->addMenu(tr("&File"));
 	_fileMenu->addAction(_fileOpenAction);
 	_fileMenu->addAction(_fileClearAction);
@@ -108,7 +112,8 @@ void QtImageViewer::createActions(){
 	_toolsMenu->addAction(_toolsCombine);
 	_toolsMenu->addAction(_toolsNegate);
 	_toolsMenu->addAction(_toolsPowerlaw);
-}
+	_toolsMenu->addAction(_toolsLinear);
+};
 
 void QtImageViewer::openFile(){
 	QFileDialog dialog(this, tr("Open File"));
@@ -121,7 +126,7 @@ void QtImageViewer::openFile(){
 
 	showImageLeft(myImage);
 	delete(myImage);
-}
+};
 
 void QtImageViewer::showImage(Image *img, ImageView imageView){
 
@@ -235,17 +240,17 @@ void QtImageViewer::showImage(Image *img, ImageView imageView){
 	(*scrollArea)->setVisible(true);
 
 	update(); // For Qt to redraw with new image
-}
+};
 
 
 
 void QtImageViewer::showImageLeft(Image *img) {
 	showImage(img, ImageView::LEFT);
-}
+};
 
 void QtImageViewer::showImageRight(Image *img) {
 	showImage(img, ImageView::RIGHT);
-}
+};
 
 void QtImageViewer::clearFile() {
 
@@ -257,7 +262,7 @@ void QtImageViewer::clearFile() {
 	_imageState = 0;
 
 	update();
-}
+};
 
 
 void QtImageViewer::combineImagesRGB() {
@@ -311,7 +316,7 @@ void QtImageViewer::combineImagesRGB() {
     delete green;
     delete blue;
 	delete rgb;
-}
+};
 
 void QtImageViewer::negate() {
 	ImageProcessor processor;
@@ -325,7 +330,7 @@ void QtImageViewer::negate() {
 	showImageRight(img);
 
 	delete img;
-}
+};
 
 void QtImageViewer::powerlaw(){
 	ImageProcessor processor;
@@ -339,7 +344,20 @@ void QtImageViewer::powerlaw(){
 	showImageRight(img);
 
 	delete img;
-}
+};
+
+void QtImageViewer::linear(){
+	ImageProcessor processor;
+	QString filename = QFileDialog::getOpenFileName(this, "Select image for transformation...");
+	if(filename.isEmpty()) return;
+
+	TiffLoader trloader = (filename.toStdString());
+	Image* img = trloader.loadImage();
+
+	processor.lineartr(img);
+	showImageRight(img);
+	delete img;
+};
 
 
 

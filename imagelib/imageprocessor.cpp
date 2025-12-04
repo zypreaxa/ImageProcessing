@@ -106,5 +106,33 @@ Image* ImageProcessor::powerlawtr(Image* img){
         return nullptr;
     }
 };
+
+Image* ImageProcessor::lineartr(Image* img) {
+    unsigned long width = img->getWidth();
+    unsigned long height = img->getHeight();
+    unsigned long channels = img->getChannels();
+    unsigned long bpc = img->getBpc();  
+
+    if(channels==1){
+        for(int y=0; y<height; y++){
+            for(int x=0; x<width; x++){
+                Pixel p = img->getPixel(x, y);
+                if(0<=p.r<100){
+                    p.r = 1/2*p.r;
+                }
+                else if(100<=p.r<200){
+                    p.r=50+(170/100)*(p.r-100);
+                }
+                else{
+                    p.r = 220+(35/55)*(p.r-200);
+                }
+                img->setPixel(x, y, p);
+            }
+        }
+        return img;
+    }
+    else return nullptr;
+
+}
     
 
