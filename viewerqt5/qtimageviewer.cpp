@@ -94,17 +94,37 @@ void QtImageViewer::createActions(){
 	_toolsNegate->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_N));
 	connect(_toolsNegate, SIGNAL(triggered()), this, SLOT(negate()));
 
+	_toolsNegateLUT = new QAction(tr("Image negation using LUT..."), this);
+	_toolsNegateLUT->setShortcut(QKeySequence(Qt::SHIFT | Qt::Key_N));
+	connect(_toolsNegateLUT, SIGNAL(triggered()), this, SLOT(negateLUT()));
+
 	_toolsPowerlaw = new QAction(tr("Power law..."), this);
 	_toolsPowerlaw->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_P));
 	connect(_toolsPowerlaw, SIGNAL(triggered()), this, SLOT(powerlaw()));
+
+	_toolsPowerlawLUT = new QAction(tr("Power law using LUT..."), this);
+	_toolsPowerlawLUT->setShortcut(QKeySequence(Qt::SHIFT | Qt::Key_P));
+	connect(_toolsPowerlawLUT, SIGNAL(triggered()), this, SLOT(powerlawLUT()));
 
 	_toolsLinear = new QAction(tr("Piece-wise linear..."), this);
 	_toolsLinear->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_L));
 	connect(_toolsLinear, SIGNAL(triggered()), this, SLOT(linear()));
 
+	_toolsLinearLUT = new QAction(tr("Linear using LUT..."), this);
+	_toolsLinearLUT->setShortcut(QKeySequence(Qt::SHIFT | Qt::Key_L));
+	connect(_toolsLinearLUT, SIGNAL(triggered()), this, SLOT(linearLUT()));
+
 	_toolsThresholding = new QAction(tr("Thresholding..."), this);
 	_toolsThresholding->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_T));
 	connect(_toolsThresholding, SIGNAL(triggered()), this, SLOT(thresholding()));
+
+	_toolsThresholdingLUT = new QAction(tr("Thresholding using LUT..."), this);
+	_toolsThresholdingLUT->setShortcut(QKeySequence(Qt::SHIFT | Qt::Key_T));
+	connect(_toolsThresholdingLUT, SIGNAL(triggered()), this, SLOT(thresholdingLUT()));
+
+	_toolsHistogrameq = new QAction(tr("Histogram equalization..."), this);
+	_toolsHistogrameq->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_H));
+	connect(_toolsHistogrameq, SIGNAL(triggered()), this, SLOT(histogrameq()));
 
 	_fileMenu = menuBar()->addMenu(tr("&File"));
 	_fileMenu->addAction(_fileOpenAction);
@@ -115,9 +135,14 @@ void QtImageViewer::createActions(){
 	_toolsMenu->addAction(_toolsFourierTransform);
 	_toolsMenu->addAction(_toolsCombine);
 	_toolsMenu->addAction(_toolsNegate);
+	_toolsMenu->addAction(_toolsNegateLUT);
 	_toolsMenu->addAction(_toolsPowerlaw);
+	_toolsMenu->addAction(_toolsPowerlawLUT);
 	_toolsMenu->addAction(_toolsLinear);
+	_toolsMenu->addAction(_toolsLinearLUT);
 	_toolsMenu->addAction(_toolsThresholding);
+	_toolsMenu->addAction(_toolsThresholdingLUT);
+	_toolsMenu->addAction(_toolsHistogrameq);
 };
 
 void QtImageViewer::openFile(){
@@ -337,6 +362,20 @@ void QtImageViewer::negate() {
 	delete img;
 };
 
+void QtImageViewer::negateLUT() {
+	ImageProcessor processor;
+	QString filename = QFileDialog::getOpenFileName(this, "Select Image for transformation...");
+    if(filename.isEmpty()) return;
+	
+	TiffLoader trloader = (filename.toStdString());
+	Image* img = trloader.loadImage();
+
+	processor.negationlut(img);
+	showImageRight(img);
+
+	delete img;
+};
+
 void QtImageViewer::powerlaw(){
 	ImageProcessor processor;
 	QString filename = QFileDialog::getOpenFileName(this, "Select image for transformation...");
@@ -346,6 +385,20 @@ void QtImageViewer::powerlaw(){
 	Image* img = trloader.loadImage();
 
 	processor.powerlawtr(img);
+	showImageRight(img);
+
+	delete img;
+};
+
+void QtImageViewer::powerlawLUT(){
+	ImageProcessor processor;
+	QString filename = QFileDialog::getOpenFileName(this, "Select image for transformation...");
+	if(filename.isEmpty()) return;
+
+	TiffLoader trloader = (filename.toStdString());
+	Image* img = trloader.loadImage();
+
+	processor.powerlawlut(img);
 	showImageRight(img);
 
 	delete img;
@@ -364,6 +417,19 @@ void QtImageViewer::linear(){
 	delete img;
 };
 
+void QtImageViewer::linearLUT(){
+	ImageProcessor processor;
+	QString filename = QFileDialog::getOpenFileName(this, "Select image for transformation...");
+	if(filename.isEmpty()) return;
+
+	TiffLoader trloader = (filename.toStdString());
+	Image* img = trloader.loadImage();
+
+	processor.linearlut(img);
+	showImageRight(img);
+	delete img;
+};
+
 void QtImageViewer::thresholding(){
 	ImageProcessor processor;
 	QString filename = QFileDialog::getOpenFileName(this, "Select image for thresholding...");
@@ -373,6 +439,32 @@ void QtImageViewer::thresholding(){
 	Image* img = trloader.loadImage();
 
 	processor.thresholdtr(img);
+	showImageRight(img);
+	delete img;
+};
+
+void QtImageViewer::thresholdingLUT(){
+	ImageProcessor processor;
+	QString filename = QFileDialog::getOpenFileName(this, "Select image for thresholding...");
+	if(filename.isEmpty()) return;
+	
+	TiffLoader trloader = (filename.toStdString());
+	Image* img = trloader.loadImage();
+
+	processor.thresholdlut(img);
+	showImageRight(img);
+	delete img;
+};
+
+void QtImageViewer::histogrameq(){
+	ImageProcessor processor;
+	QString filename = QFileDialog::getOpenFileName(this, "Select image for equalization...");
+	if(filename.isEmpty()) return;
+
+	TiffLoader trloader = (filename.toStdString());
+	Image* img = trloader.loadImage();
+
+	processor.histogramtr(img);
 	showImageRight(img);
 	delete img;
 };

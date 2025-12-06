@@ -33,9 +33,14 @@ public slots:
 	void quit();
 	void combineImagesRGB();
 	void negate();
+	void negateLUT();
 	void powerlaw();
+	void powerlawLUT();
 	void linear();
+	void linearLUT();
 	void thresholding();
+	void thresholdingLUT();
+	void histogrameq();
 private:
 	enum ImageView{
 		NONE = 0,
@@ -75,9 +80,14 @@ private:
 	QAction *_toolsFourierTransform{nullptr};
 	QAction *_toolsCombine{nullptr};
 	QAction *_toolsNegate{nullptr};
+	QAction *_toolsNegateLUT{nullptr};
 	QAction *_toolsPowerlaw{nullptr};
+	QAction *_toolsPowerlawLUT{nullptr};
 	QAction *_toolsLinear{nullptr};
+	QAction *_toolsLinearLUT{nullptr};
 	QAction *_toolsThresholding{nullptr};
+	QAction *_toolsThresholdingLUT{nullptr};
+	QAction *_toolsHistogrameq{nullptr};
 	
 };
 

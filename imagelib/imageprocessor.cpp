@@ -71,6 +71,27 @@ Image* ImageProcessor::negationtr(Image* img){
 
 };
 
+Image* ImageProcessor::negationlut(Image* img){
+    size_t width = img->getWidth();
+    size_t height = img->getHeight();
+
+    std::cout << "Inverting greyscale image...\n";
+
+    uint8_t lut[256];
+    for(int k=0; k<256; k++){
+        lut[k] = 255 - k;
+    }
+
+    for(size_t y=0; y<height; ++y){
+        for(size_t x=0; x<width; ++x){
+            Pixel p = img->getPixel(x, y);
+            p.r = lut[p.r];
+            img->setPixel(x, y, p);
+        }
+    }
+    return img;
+};
+
 Image* ImageProcessor::powerlawtr(Image* img){
     unsigned long width = img->getWidth();
     unsigned long height = img->getHeight();
@@ -85,6 +106,48 @@ Image* ImageProcessor::powerlawtr(Image* img){
             for(int x=0; x<width; x++){
                 Pixel p = img->getPixel(x, y);
                 p.r = 255.0 * std::pow(p.r / 255.0, gamma);
+                img->setPixel(x, y, p);
+            }
+        }
+        return img;
+    }
+    else if(channels==3){  // completely incorrect lol
+        for(int y=0; y<height; y++){
+            for(int x=0; x<width; x++){
+                Pixel p = img->getPixel(x, y);
+                p.r = p.r ^ gamma;
+                p.g = p.g ^ gamma;
+                p.b = p.b ^ gamma;
+                img->setPixel(x, y, p);
+            }
+        }
+        return img;
+    }
+    else {
+        std::cout << "Image is of unknown format.";
+        return nullptr;
+    }
+};
+
+Image* ImageProcessor::powerlawlut(Image* img){
+    unsigned long width = img->getWidth();
+    unsigned long height = img->getHeight();
+    unsigned long channels = img->getChannels(); // supposed to be mainly greyscale, but might as well
+    unsigned long bpc = img->getBpc();
+    int gamma;
+    std::cout << "Select gamma value: ";
+    std::cin >> gamma;
+
+    if(channels==1){
+        uint8_t lut[256];
+        for(int k=0; k<256; k++){
+            lut[k] = 255.0 * std::pow(k / 255.0, gamma);
+        }
+
+        for(int y=0; y<height; y++){
+            for(int x=0; x<width; x++){
+                Pixel p = img->getPixel(x, y);
+                p.r = lut[p.r];
                 img->setPixel(x, y, p);
             }
         }
@@ -151,7 +214,55 @@ Image* ImageProcessor::lineartr(Image* img) {
         std::cout << "This format cannot be transformed yet. Please choose a greyscale image." << std::endl;
         return nullptr;
     }
-}
+};
+
+Image* ImageProcessor::linearlut(Image* img) {
+    unsigned long width = img->getWidth();
+    unsigned long height = img->getHeight();
+    unsigned long channels = img->getChannels();
+
+    double L = 255.0;
+    double r1 = 3.0 * L / 8.0;
+    double s1 = L / 8.0;
+    double r2 = 5.0 * L / 8.0;
+    double s2 = 7.0 * L / 8.0;
+
+    if (channels == 1) {
+        uint8_t lut[256];
+        for(int k=0; k<256; k++){
+            double r = k;
+            double s;
+
+            if (r <= r1) {
+                s = (s1 / r1) * r;
+            }
+            else if (r <= r2) {
+                double m = (s2 - s1) / (r2 - r1);
+                s = m * (r - r1) + s1;
+            }
+            else {
+                double m = (L - 1 - s2) / (L - 1 - r2);
+                s = m * (r - r2) + s2;
+            }
+
+                // Clamp
+            s = std::clamp(s, 0.0, 255.0);
+            lut[k]= static_cast<uint8_t>(std::round(s));
+        }
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                Pixel p = img->getPixel(x, y);
+                p.r = lut[p.r];
+                img->setPixel(x, y, p);
+            }
+        }
+        return img;
+    }
+    else {
+        std::cout << "This format cannot be transformed yet. Please choose a greyscale image." << std::endl;
+        return nullptr;
+    }
+};
 
 Image* ImageProcessor::thresholdtr(Image* img){
     unsigned long width, height, channels;
@@ -190,6 +301,83 @@ Image* ImageProcessor::thresholdtr(Image* img){
         std::cout << "This format cannot be transformed yet. Please choose a greyscale image." << std::endl;
         return nullptr;
     }
-}
+};
+
+Image* ImageProcessor::thresholdlut(Image* img){
+    unsigned long width, height, channels;
+    width = img->getWidth();
+    height = img->getHeight();
+    channels = img->getChannels();
+
+    int L, r0, s0, r1, s1, r2, s2, r3, s3, newval;
+    L=256;
+    r0=0; s0=r0;
+    r1=L/2; s1=0;
+    r2=r1; s2=L-1;
+    r3=s2; s3=s2;
+
+    uint8_t lut[256];
+    for(int k=0; k<256; k++){
+        if(k <= r1){
+            newval=s0+((s1-s0)/(r1-r0))*(k - r0);
+        } 
+        else if(k <= r2){
+            newval=s1+((s2-s1)/(r2-r1))*(k - r1);
+        }
+        else{
+            newval=s3+((s3-s2)/(r3-r2))*(k - r2);
+        }
+        std::clamp(newval, 0, 255);
+        lut[k] = static_cast<uint8_t>(newval);
+    }
+
+    if(channels==1){
+        for(int y=0; y<height; y++){
+            for(int x=0; x<width; x++){
+                Pixel p = img->getPixel(x, y);
+                p.r = lut[p.r];
+                img->setPixel(x, y, p);
+            }
+        }
+        return img;
+    }
+    else{
+        std::cout << "This format cannot be transformed yet. Please choose a greyscale image." << std::endl;
+        return nullptr;
+    }
+};
+
+Image* ImageProcessor::histogramtr(Image* img){
+    std::vector<unsigned int> hist = img->getHistogram();
+    unsigned long width, height, x, y;
+    width = img->getWidth();
+    height = img->getHeight();
+    double p[256];
+    double res = width * height;
+
+    for(int j=0; j<256; j++){
+        p[j] = hist[j] / res;
+    }
+    double cdf[256];
+    cdf[0] = p[0];
+
+    for(int k=1; k<256; k++){
+        cdf[k] = cdf[k-1] + p[k];
+    }
+
+    uint8_t lut[256];
+    for(int k=0; k<256; k++){
+        lut[k] = std::round((256-1)*cdf[k]);
+    }
+
+    for(y=0; y<height; y++){
+        for(x=0; x<width; x++){
+            Pixel p = img->getPixel(x, y);
+            p.r = lut[p.r];
+            img->setPixel(x, y, p);
+        }
+    }
+    return img;
+};
     
 
