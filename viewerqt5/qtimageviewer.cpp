@@ -158,7 +158,7 @@ void QtImageViewer::openFile(){
 	delete(myImage);
 };
 
-void QtImageViewer::showImage(Image *img, ImageView imageView){
+void QtImageViewer::showImage(Image<uint8_t> *img, ImageView imageView){
 
 	// get widgets for requested side
 	QtCharts::QChartView **chartView{nullptr};
@@ -274,11 +274,11 @@ void QtImageViewer::showImage(Image *img, ImageView imageView){
 
 
 
-void QtImageViewer::showImageLeft(Image *img) {
+void QtImageViewer::showImageLeft(Image<uint8_t> *img) {
 	showImage(img, ImageView::LEFT);
 };
 
-void QtImageViewer::showImageRight(Image *img) {
+void QtImageViewer::showImageRight(Image<uint8_t> *img) {
 	showImage(img, ImageView::RIGHT);
 };
 
@@ -298,7 +298,7 @@ void QtImageViewer::clearFile() {
 void QtImageViewer::combineImagesRGB() {
     ImageProcessor processor;
 
-    QString redFile   = QFileDialog::getOpenFileName(this, "Select RED channel TIFF");
+    QString redFile = QFileDialog::getOpenFileName(this, "Select RED channel TIFF");
     if(redFile.isEmpty()) return;
 
     QString greenFile = QFileDialog::getOpenFileName(this, "Select GREEN channel TIFF");
@@ -308,20 +308,20 @@ void QtImageViewer::combineImagesRGB() {
     if(blueFile.isEmpty()) return;
 
     TiffLoader redLoader(redFile.toStdString());
-    Image* red = redLoader.loadImage();
+    Image<uint8_t>* red = redLoader.loadImage();
 
     TiffLoader greenLoader(greenFile.toStdString());
-    Image* green = greenLoader.loadImage();
+    Image<uint8_t>* green = greenLoader.loadImage();
 
     TiffLoader blueLoader(blueFile.toStdString());
-    Image* blue = blueLoader.loadImage();
+    Image<uint8_t>* blue = blueLoader.loadImage();
 
     if(!red || !green || !blue) {
         std::cout << "Failed to load one of the images." << std::endl;
         return;
     }
 
-    Image* rgb = processor.combineRGB(red, green, blue);
+    Image<uint8_t>* rgb = processor.combineRGB(red, green, blue);
 
     if(!rgb) {
         std::cout << "RGB combination failed." << std::endl;
@@ -354,7 +354,7 @@ void QtImageViewer::negate() {
     if(filename.isEmpty()) return;
 	
 	TiffLoader trloader = (filename.toStdString());
-	Image* img = trloader.loadImage();
+	Image<uint8_t>* img = trloader.loadImage();
 
 	processor.negationtr(img);
 	showImageRight(img);
@@ -368,7 +368,7 @@ void QtImageViewer::negateLUT() {
     if(filename.isEmpty()) return;
 	
 	TiffLoader trloader = (filename.toStdString());
-	Image* img = trloader.loadImage();
+	Image<uint8_t>* img = trloader.loadImage();
 
 	processor.negationlut(img);
 	showImageRight(img);
@@ -382,7 +382,7 @@ void QtImageViewer::powerlaw(){
 	if(filename.isEmpty()) return;
 
 	TiffLoader trloader = (filename.toStdString());
-	Image* img = trloader.loadImage();
+	Image<uint8_t>* img = trloader.loadImage();
 
 	processor.powerlawtr(img);
 	showImageRight(img);
@@ -396,7 +396,7 @@ void QtImageViewer::powerlawLUT(){
 	if(filename.isEmpty()) return;
 
 	TiffLoader trloader = (filename.toStdString());
-	Image* img = trloader.loadImage();
+	Image<uint8_t>* img = trloader.loadImage();
 
 	processor.powerlawlut(img);
 	showImageRight(img);
@@ -410,7 +410,7 @@ void QtImageViewer::linear(){
 	if(filename.isEmpty()) return;
 
 	TiffLoader trloader = (filename.toStdString());
-	Image* img = trloader.loadImage();
+	Image<uint8_t>* img = trloader.loadImage();
 
 	processor.lineartr(img);
 	showImageRight(img);
@@ -423,7 +423,7 @@ void QtImageViewer::linearLUT(){
 	if(filename.isEmpty()) return;
 
 	TiffLoader trloader = (filename.toStdString());
-	Image* img = trloader.loadImage();
+	Image<uint8_t>* img = trloader.loadImage();
 
 	processor.linearlut(img);
 	showImageRight(img);
@@ -436,7 +436,7 @@ void QtImageViewer::thresholding(){
 	if(filename.isEmpty()) return;
 	
 	TiffLoader trloader = (filename.toStdString());
-	Image* img = trloader.loadImage();
+	Image<uint8_t>* img = trloader.loadImage();
 
 	processor.thresholdtr(img);
 	showImageRight(img);
@@ -449,7 +449,7 @@ void QtImageViewer::thresholdingLUT(){
 	if(filename.isEmpty()) return;
 	
 	TiffLoader trloader = (filename.toStdString());
-	Image* img = trloader.loadImage();
+	Image<uint8_t>* img = trloader.loadImage();
 
 	processor.thresholdlut(img);
 	showImageRight(img);
@@ -462,7 +462,7 @@ void QtImageViewer::histogrameq(){
 	if(filename.isEmpty()) return;
 
 	TiffLoader trloader = (filename.toStdString());
-	Image* img = trloader.loadImage();
+	Image<uint8_t>* img = trloader.loadImage();
 
 	processor.histogramtr(img);
 	showImageRight(img);

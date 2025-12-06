@@ -93,7 +93,7 @@ void TiffLoader::printMetaData() { // pretty n stuff
     std::cout << "+-----------------+------------+\n";
 }
 
-Image* TiffLoader::loadImage(){
+Image<uint8_t>* TiffLoader::loadImage(){
 	// yes, should ideally throw an exception on fail, we skip that.
 	if(_tiff){
 		unsigned char* imageData{nullptr};

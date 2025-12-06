@@ -19,7 +19,7 @@ int main(int argc, char **argv) {
 		// Load tiff using your library!
 		TiffLoader *tiffLoader = new TiffLoader(filename.toStdString());
 		tiffLoader->printMetaData();
-		Image *myImage = tiffLoader->loadImage();
+		Image<uint8_t> *myImage = tiffLoader->loadImage();
 
 		imv->showImageLeft(myImage);
 		delete myImage;
@@ -32,7 +32,7 @@ int main(int argc, char **argv) {
 		// Load tiff using your library!
 		TiffLoader *tiffLoader = new TiffLoader(filename.toStdString());
 		tiffLoader->printMetaData();
-		Image *myImage = tiffLoader->loadImage();
+		Image<uint8_t> *myImage = tiffLoader->loadImage();
 
 		imv->showImageRight(myImage);
 		delete myImage;

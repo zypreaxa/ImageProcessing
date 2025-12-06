@@ -9,7 +9,7 @@ JpegLoader::JpegLoader(std::string filename) : ImageLoader(filename){
 
 JpegLoader::~JpegLoader() {};
 
-Image* JpegLoader::loadImage(){
+Image<uint8_t>* JpegLoader::loadImage(){
 	std::cout<<"JpegLoader::loadImageData()"<<std::endl;
 	std::cout<<"- not implemented"<<std::endl;
 	return nullptr;

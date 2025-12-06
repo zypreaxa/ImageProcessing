@@ -26,8 +26,8 @@ public:
 			  
 public slots:
 	//void showFile(const QString filename);
-	void showImageLeft(Image *img);
-	void showImageRight(Image *img);
+	void showImageLeft(Image<uint8_t> *img);
+	void showImageRight(Image<uint8_t> *img);
 	void openFile();
 	void clearFile();
 	void quit();
@@ -56,7 +56,7 @@ private:
 
 	unsigned int _imageState{ImageView::NONE};
 
-	void showImage(Image* img, ImageView view);
+	void showImage(Image<uint8_t>* img, ImageView view);
 	
 	QImage _lImage;
 	QLabel *_lImageLabel{nullptr};

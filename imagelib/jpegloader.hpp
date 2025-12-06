@@ -11,7 +11,7 @@ public:
 	virtual ~JpegLoader();
 
 	// Image data related
-	Image* loadImage();
+	Image<uint8_t>* loadImage();
 	void printMetaData();
 protected:
 	// File related
