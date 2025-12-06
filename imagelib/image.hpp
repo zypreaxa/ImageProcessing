@@ -18,8 +18,8 @@ public:
 	unsigned long length,
 	unsigned long channels,
 	unsigned long bpc,
-	unsigned char* data): _width(width), _length(length), _channels(channels), _bpc(bpc), _data(data)
-	{}
+	unsigned char* data): _width(width), _length(length), _channels(channels), _bpc(bpc), _data(data){}
+
 	virtual ~Image();
 
 	// File related
@@ -54,6 +54,10 @@ public:
 
 	// histogram - here using a std::vector
 	std::vector<unsigned int> getHistogram();
+
+	void toUChar();
+	void toFloat();
+
 protected:
 	unsigned long _width{0};
 	unsigned long _length{0};
@@ -63,5 +67,6 @@ protected:
 	std::string _filename{};
 	
 	unsigned char* _data{nullptr};
+	float* _dataf{nullptr};
 };
 #endif

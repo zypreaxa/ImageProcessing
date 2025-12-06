@@ -175,7 +175,6 @@ Image* ImageProcessor::lineartr(Image* img) {
     unsigned long width = img->getWidth();
     unsigned long height = img->getHeight();
     unsigned long channels = img->getChannels();
-
     double L = 255.0;
     double r1 = 3.0 * L / 8.0;
     double s1 = L / 8.0;
