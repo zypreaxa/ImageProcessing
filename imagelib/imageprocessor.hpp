@@ -14,7 +14,9 @@ public:
         Image<>* blue
     );
     
-    static Image<>* togreyscale(Image<>* img);
+    // image transforms, CA1 
+
+    static Image<>* togreyscale(Image<>* img); 
     static Image<>* negationtr(Image<>* img);
     static Image<>* negationlut(Image<>* img);
     static Image<>* powerlawtr(Image<>* img);
@@ -25,6 +27,18 @@ public:
     static Image<>* thresholdlut(Image<>* img);
     static Image<>* histogramtr(Image<>* img);
     static Image<>* lowpass(Image<>* img);    
+
+    static Image<float>* toFloat(Image<uint8_t>* img8);
+    static Image<uint8_t>* to8bit(Image<float>* imgf);
+
+private:
+// my compiler is ancient so had to make my own clamp lol
+    template <class T = uint8_t>
+    static const T& clamp(const T& v, const T& lo, const T& hi)
+    {
+        return (v < lo) ? lo : (hi < v) ? hi : v;
+    };
+
 };
 
 #endif

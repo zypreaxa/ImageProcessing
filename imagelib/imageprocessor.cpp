@@ -417,6 +417,33 @@ Image<>* ImageProcessor::histogramtr(Image<>* img){
     return img;
 };
 
+// image conversion 8bit <-> float
+Image<float>* ImageProcessor::toFloat(Image<uint8_t>* img8){
+    size_t width, height;
+    unsigned long channels, bpc;
+    size_t size = width * height * channels * bpc / 8;
+    uint8_t* data8 = img8->getImageData();
+    float* fdata = new float[size];
+    for(size_t i=0; i<size; i++){
+        fdata[i] = data8[i] / 255.0f;
+    }
+    return new Image(width, height, channels, bpc, fdata); // this image object will need to be manually deleted to not cause a memory leak !!!
+};
+Image<uint8_t>* ImageProcessor::to8bit(Image<float>* imgf){
+    size_t width, height;
+    unsigned long channels, bpc;
+    size_t size = width * height * channels * bpc / 8;
+    float* dataf = imgf->getImageData();
+    uint8_t* data8 = new uint8_t[size];
+    uint8_t temp;
+    for(size_t i=0; i<size; i++){
+        //temp = dataf[i] * 255.0f;
+        temp = std::round(dataf[i]*255.0f); 
+        data8[i] = clamp<>(temp, uint8_t(0), uint8_t(255));
+    }
+    return new Image(width, height, channels, bpc, data8); // same with deleting this, don't forget :')
+};
+
 
 
     
