@@ -33,6 +33,34 @@ Image<>* ImageProcessor::combineRGB(
     return out;
 };
 
+Image<>* ImageProcessor::togreyscale(Image<>* img){
+    size_t width, height;
+    unsigned long bpc, channels;
+    width = img->getWidth();
+    height = img->getHeight();
+    channels = img->getChannels();
+    uint8_t gsc;
+    if(channels != 3 && channels != 1){
+        std::cout << "This image is not a valid RGB format.";
+        return nullptr;
+    }
+    else if(channels == 1){
+        std::cout << "This image is already greyscale.";
+        return nullptr;
+    }
+    for(size_t y=0; y<height; y++){
+        for(size_t x=0; x<width; x++){
+            Pixel<uint8_t> p = img->getPixel(x, y);
+            gsc = std::round((p.r + p.g + p.b) / 3.0);
+            p.r = gsc;
+            p.g = gsc;
+            p.b = gsc;
+            img->setPixel(x, y, p);
+        }
+    }
+    return img;
+};  
+
 Image<>* ImageProcessor::negationtr(Image<>* img){
     size_t width = img->getWidth();
     size_t height = img->getHeight();
@@ -86,6 +114,8 @@ Image<>* ImageProcessor::negationlut(Image<>* img){
         for(size_t x=0; x<width; ++x){
             Pixel p = img->getPixel(x, y);
             p.r = lut[p.r];
+            p.g = lut[p.r];
+            p.b = lut[p.r];
             img->setPixel(x, y, p);
         }
     }
@@ -148,6 +178,8 @@ Image<>* ImageProcessor::powerlawlut(Image<>* img){
             for(int x=0; x<width; x++){
                 Pixel p = img->getPixel(x, y);
                 p.r = lut[p.r];
+                p.g = lut[p.r];
+                p.b = lut[p.r];
                 img->setPixel(x, y, p);
             }
         }
@@ -252,6 +284,8 @@ Image<>* ImageProcessor::linearlut(Image<>* img) {
             for (int x = 0; x < width; x++) {
                 Pixel p = img->getPixel(x, y);
                 p.r = lut[p.r];
+                p.g = lut[p.r];
+                p.b = lut[p.r];
                 img->setPixel(x, y, p);
             }
         }
@@ -335,6 +369,8 @@ Image<>* ImageProcessor::thresholdlut(Image<>* img){
             for(int x=0; x<width; x++){
                 Pixel p = img->getPixel(x, y);
                 p.r = lut[p.r];
+                p.g = lut[p.r];
+                p.b = lut[p.b];
                 img->setPixel(x, y, p);
             }
         }
@@ -373,6 +409,8 @@ Image<>* ImageProcessor::histogramtr(Image<>* img){
         for(x=0; x<width; x++){
             Pixel p = img->getPixel(x, y);
             p.r = lut[p.r];
+            p.g = lut[p.r];
+            p.b = lut[p.r];
             img->setPixel(x, y, p);
         }
     }

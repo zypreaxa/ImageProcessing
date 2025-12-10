@@ -14,6 +14,7 @@ public:
         Image<>* blue
     );
     
+    static Image<>* togreyscale(Image<>* img);
     static Image<>* negationtr(Image<>* img);
     static Image<>* negationlut(Image<>* img);
     static Image<>* powerlawtr(Image<>* img);
@@ -23,7 +24,7 @@ public:
     static Image<>* thresholdtr(Image<>* img);
     static Image<>* thresholdlut(Image<>* img);
     static Image<>* histogramtr(Image<>* img);
-    static Image<>* lowpass(Image<>* img);     
+    static Image<>* lowpass(Image<>* img);    
 };
 
 #endif

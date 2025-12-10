@@ -86,6 +86,10 @@ void QtImageViewer::createActions(){
 	_toolsFourierTransform = new QAction(tr("&Fourier transform..."), this);
 	_toolsFourierTransform->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_F));
 
+	_toolsTogreyscale = new QAction(tr("Convert image to greyscale..."), this);
+	_toolsTogreyscale->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_G));
+	connect(_toolsTogreyscale, SIGNAL(triggered()), this, SLOT(togreyscale()));
+
 	_toolsCombine = new QAction(tr("&Combine images into RGB..."), this);
 	_toolsCombine->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_C));
 	connect(_toolsCombine, SIGNAL(triggered()), this, SLOT(combineImagesRGB()));
@@ -133,6 +137,7 @@ void QtImageViewer::createActions(){
 
 	_toolsMenu = menuBar()->addMenu(tr("&Tools"));
 	_toolsMenu->addAction(_toolsFourierTransform);
+	_toolsMenu->addAction(_toolsTogreyscale);
 	_toolsMenu->addAction(_toolsCombine);
 	_toolsMenu->addAction(_toolsNegate);
 	_toolsMenu->addAction(_toolsNegateLUT);
@@ -294,6 +299,19 @@ void QtImageViewer::clearFile() {
 	update();
 };
 
+void QtImageViewer::togreyscale(){
+	ImageProcessor processor;
+
+	QString filename = QFileDialog::getOpenFileName(this, "Select image for conversion");
+	if(filename.isEmpty()){
+		return;
+	}
+	TiffLoader trloader(filename.toStdString());
+	Image<>* rgb = trloader.loadImage();
+	Image<>* gsc = processor.togreyscale(rgb);
+	showImageRight(gsc);
+	delete gsc;
+};
 
 void QtImageViewer::combineImagesRGB() {
     ImageProcessor processor;

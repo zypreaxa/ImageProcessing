@@ -32,6 +32,7 @@ public slots:
 	void clearFile();
 	void quit();
 	void combineImagesRGB();
+	void togreyscale();
 	void negate();
 	void negateLUT();
 	void powerlaw();
@@ -78,6 +79,7 @@ private:
 
 	QMenu *_toolsMenu{nullptr};
 	QAction *_toolsFourierTransform{nullptr};
+	QAction *_toolsTogreyscale{nullptr};
 	QAction *_toolsCombine{nullptr};
 	QAction *_toolsNegate{nullptr};
 	QAction *_toolsNegateLUT{nullptr};

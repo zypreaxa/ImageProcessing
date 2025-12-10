@@ -70,7 +70,7 @@ public:
             }
         }
         return histogram;
-    }
+    };
 
 protected:
     unsigned long _width{0};
