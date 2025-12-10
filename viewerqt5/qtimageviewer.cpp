@@ -152,13 +152,13 @@ void QtImageViewer::openFile(){
 
 	TiffLoader* tiffLoader = new TiffLoader(filename.toStdString());
 	tiffLoader->printMetaData();
-	Image* myImage = tiffLoader->loadImage();
+	Image<>* myImage = tiffLoader->loadImage();
 
 	showImageLeft(myImage);
 	delete(myImage);
 };
 
-void QtImageViewer::showImage(Image *img, ImageView imageView){
+void QtImageViewer::showImage(Image<> *img, ImageView imageView){
 
 	// get widgets for requested side
 	QtCharts::QChartView **chartView{nullptr};
@@ -274,11 +274,11 @@ void QtImageViewer::showImage(Image *img, ImageView imageView){
 
 
 
-void QtImageViewer::showImageLeft(Image *img) {
+void QtImageViewer::showImageLeft(Image<> *img) {
 	showImage(img, ImageView::LEFT);
 };
 
-void QtImageViewer::showImageRight(Image *img) {
+void QtImageViewer::showImageRight(Image<> *img) {
 	showImage(img, ImageView::RIGHT);
 };
 
@@ -308,20 +308,20 @@ void QtImageViewer::combineImagesRGB() {
     if(blueFile.isEmpty()) return;
 
     TiffLoader redLoader(redFile.toStdString());
-    Image* red = redLoader.loadImage();
+    Image<>* red = redLoader.loadImage();
 
     TiffLoader greenLoader(greenFile.toStdString());
-    Image* green = greenLoader.loadImage();
+    Image<>* green = greenLoader.loadImage();
 
     TiffLoader blueLoader(blueFile.toStdString());
-    Image* blue = blueLoader.loadImage();
+    Image<>* blue = blueLoader.loadImage();
 
     if(!red || !green || !blue) {
         std::cout << "Failed to load one of the images." << std::endl;
         return;
     }
 
-    Image* rgb = processor.combineRGB(red, green, blue);
+    Image<>* rgb = processor.combineRGB(red, green, blue);
 
     if(!rgb) {
         std::cout << "RGB combination failed." << std::endl;
@@ -354,7 +354,7 @@ void QtImageViewer::negate() {
     if(filename.isEmpty()) return;
 	
 	TiffLoader trloader = (filename.toStdString());
-	Image* img = trloader.loadImage();
+	Image<>* img = trloader.loadImage();
 
 	processor.negationtr(img);
 	showImageRight(img);
@@ -368,7 +368,7 @@ void QtImageViewer::negateLUT() {
     if(filename.isEmpty()) return;
 	
 	TiffLoader trloader = (filename.toStdString());
-	Image* img = trloader.loadImage();
+	Image<>* img = trloader.loadImage();
 
 	processor.negationlut(img);
 	showImageRight(img);
@@ -382,7 +382,7 @@ void QtImageViewer::powerlaw(){
 	if(filename.isEmpty()) return;
 
 	TiffLoader trloader = (filename.toStdString());
-	Image* img = trloader.loadImage();
+	Image<>* img = trloader.loadImage();
 
 	processor.powerlawtr(img);
 	showImageRight(img);
@@ -396,7 +396,7 @@ void QtImageViewer::powerlawLUT(){
 	if(filename.isEmpty()) return;
 
 	TiffLoader trloader = (filename.toStdString());
-	Image* img = trloader.loadImage();
+	Image<>* img = trloader.loadImage();
 
 	processor.powerlawlut(img);
 	showImageRight(img);
@@ -410,7 +410,7 @@ void QtImageViewer::linear(){
 	if(filename.isEmpty()) return;
 
 	TiffLoader trloader = (filename.toStdString());
-	Image* img = trloader.loadImage();
+	Image<>* img = trloader.loadImage();
 
 	processor.lineartr(img);
 	showImageRight(img);
@@ -423,7 +423,7 @@ void QtImageViewer::linearLUT(){
 	if(filename.isEmpty()) return;
 
 	TiffLoader trloader = (filename.toStdString());
-	Image* img = trloader.loadImage();
+	Image<>* img = trloader.loadImage();
 
 	processor.linearlut(img);
 	showImageRight(img);
@@ -436,7 +436,7 @@ void QtImageViewer::thresholding(){
 	if(filename.isEmpty()) return;
 	
 	TiffLoader trloader = (filename.toStdString());
-	Image* img = trloader.loadImage();
+	Image<>* img = trloader.loadImage();
 
 	processor.thresholdtr(img);
 	showImageRight(img);
@@ -449,7 +449,7 @@ void QtImageViewer::thresholdingLUT(){
 	if(filename.isEmpty()) return;
 	
 	TiffLoader trloader = (filename.toStdString());
-	Image* img = trloader.loadImage();
+	Image<>* img = trloader.loadImage();
 
 	processor.thresholdlut(img);
 	showImageRight(img);
@@ -462,7 +462,7 @@ void QtImageViewer::histogrameq(){
 	if(filename.isEmpty()) return;
 
 	TiffLoader trloader = (filename.toStdString());
-	Image* img = trloader.loadImage();
+	Image<>* img = trloader.loadImage();
 
 	processor.histogramtr(img);
 	showImageRight(img);

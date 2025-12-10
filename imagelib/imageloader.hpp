@@ -17,7 +17,7 @@ public:
 	unsigned long getBPC();
 
 	// Image data related
-	virtual Image* loadImage()=0;
+	virtual ImageBase* loadImage()=0;
 	virtual void printMetaData()=0;
 protected:
 	// File related

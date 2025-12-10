@@ -23,7 +23,7 @@ QT_WARNING_PUSH
 QT_WARNING_DISABLE_DEPRECATED
 struct qt_meta_stringdata_QtImageViewer_t {
     QByteArrayData data[19];
-    char stringdata0[192];
+    char stringdata0[201];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -35,29 +35,30 @@ static const qt_meta_stringdata_QtImageViewer_t qt_meta_stringdata_QtImageViewer
 QT_MOC_LITERAL(0, 0, 13), // "QtImageViewer"
 QT_MOC_LITERAL(1, 14, 13), // "showImageLeft"
 QT_MOC_LITERAL(2, 28, 0), // ""
-QT_MOC_LITERAL(3, 29, 6), // "Image*"
-QT_MOC_LITERAL(4, 36, 3), // "img"
-QT_MOC_LITERAL(5, 40, 14), // "showImageRight"
-QT_MOC_LITERAL(6, 55, 8), // "openFile"
-QT_MOC_LITERAL(7, 64, 9), // "clearFile"
-QT_MOC_LITERAL(8, 74, 4), // "quit"
-QT_MOC_LITERAL(9, 79, 16), // "combineImagesRGB"
-QT_MOC_LITERAL(10, 96, 6), // "negate"
-QT_MOC_LITERAL(11, 103, 9), // "negateLUT"
-QT_MOC_LITERAL(12, 113, 8), // "powerlaw"
-QT_MOC_LITERAL(13, 122, 11), // "powerlawLUT"
-QT_MOC_LITERAL(14, 134, 6), // "linear"
-QT_MOC_LITERAL(15, 141, 9), // "linearLUT"
-QT_MOC_LITERAL(16, 151, 12), // "thresholding"
-QT_MOC_LITERAL(17, 164, 15), // "thresholdingLUT"
-QT_MOC_LITERAL(18, 180, 11) // "histogrameq"
+QT_MOC_LITERAL(3, 29, 15), // "Image<uint8_t>*"
+QT_MOC_LITERAL(4, 45, 3), // "img"
+QT_MOC_LITERAL(5, 49, 14), // "showImageRight"
+QT_MOC_LITERAL(6, 64, 8), // "openFile"
+QT_MOC_LITERAL(7, 73, 9), // "clearFile"
+QT_MOC_LITERAL(8, 83, 4), // "quit"
+QT_MOC_LITERAL(9, 88, 16), // "combineImagesRGB"
+QT_MOC_LITERAL(10, 105, 6), // "negate"
+QT_MOC_LITERAL(11, 112, 9), // "negateLUT"
+QT_MOC_LITERAL(12, 122, 8), // "powerlaw"
+QT_MOC_LITERAL(13, 131, 11), // "powerlawLUT"
+QT_MOC_LITERAL(14, 143, 6), // "linear"
+QT_MOC_LITERAL(15, 150, 9), // "linearLUT"
+QT_MOC_LITERAL(16, 160, 12), // "thresholding"
+QT_MOC_LITERAL(17, 173, 15), // "thresholdingLUT"
+QT_MOC_LITERAL(18, 189, 11) // "histogrameq"
 
     },
-    "QtImageViewer\0showImageLeft\0\0Image*\0"
-    "img\0showImageRight\0openFile\0clearFile\0"
-    "quit\0combineImagesRGB\0negate\0negateLUT\0"
-    "powerlaw\0powerlawLUT\0linear\0linearLUT\0"
-    "thresholding\0thresholdingLUT\0histogrameq"
+    "QtImageViewer\0showImageLeft\0\0"
+    "Image<uint8_t>*\0img\0showImageRight\0"
+    "openFile\0clearFile\0quit\0combineImagesRGB\0"
+    "negate\0negateLUT\0powerlaw\0powerlawLUT\0"
+    "linear\0linearLUT\0thresholding\0"
+    "thresholdingLUT\0histogrameq"
 };
 #undef QT_MOC_LITERAL
 
@@ -117,8 +118,8 @@ void QtImageViewer::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _i
         auto *_t = static_cast<QtImageViewer *>(_o);
         (void)_t;
         switch (_id) {
-        case 0: _t->showImageLeft((*reinterpret_cast< Image*(*)>(_a[1]))); break;
-        case 1: _t->showImageRight((*reinterpret_cast< Image*(*)>(_a[1]))); break;
+        case 0: _t->showImageLeft((*reinterpret_cast< Image<uint8_t>*(*)>(_a[1]))); break;
+        case 1: _t->showImageRight((*reinterpret_cast< Image<uint8_t>*(*)>(_a[1]))); break;
         case 2: _t->openFile(); break;
         case 3: _t->clearFile(); break;
         case 4: _t->quit(); break;

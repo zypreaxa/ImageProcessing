@@ -3,10 +3,10 @@
 #include <cmath>
 #include <iostream>
 
-Image* ImageProcessor::combineRGB(
-    Image* red,
-    Image* green,
-    Image* blue
+Image<>* ImageProcessor::combineRGB(
+    Image<>* red,
+    Image<>* green,
+    Image<>* blue
 )
 {
     if (!red | !green | !blue) {
@@ -29,11 +29,11 @@ Image* ImageProcessor::combineRGB(
         }
     }
 
-    Image* out = new Image(width, height, channels, bpc, data);
+    Image<>* out = new Image(width, height, channels, bpc, data);
     return out;
 };
 
-Image* ImageProcessor::negationtr(Image* img){
+Image<>* ImageProcessor::negationtr(Image<>* img){
     size_t width = img->getWidth();
     size_t height = img->getHeight();
     unsigned long channels = img->getChannels();
@@ -71,7 +71,7 @@ Image* ImageProcessor::negationtr(Image* img){
 
 };
 
-Image* ImageProcessor::negationlut(Image* img){
+Image<>* ImageProcessor::negationlut(Image<>* img){
     size_t width = img->getWidth();
     size_t height = img->getHeight();
 
@@ -92,7 +92,7 @@ Image* ImageProcessor::negationlut(Image* img){
     return img;
 };
 
-Image* ImageProcessor::powerlawtr(Image* img){
+Image<>* ImageProcessor::powerlawtr(Image<>* img){
     unsigned long width = img->getWidth();
     unsigned long height = img->getHeight();
     unsigned long channels = img->getChannels(); // supposed to be mainly greyscale, but might as well
@@ -129,7 +129,7 @@ Image* ImageProcessor::powerlawtr(Image* img){
     }
 };
 
-Image* ImageProcessor::powerlawlut(Image* img){
+Image<>* ImageProcessor::powerlawlut(Image<>* img){
     unsigned long width = img->getWidth();
     unsigned long height = img->getHeight();
     unsigned long channels = img->getChannels(); // supposed to be mainly greyscale, but might as well
@@ -171,7 +171,7 @@ Image* ImageProcessor::powerlawlut(Image* img){
     }
 };
 
-Image* ImageProcessor::lineartr(Image* img) {
+Image<>* ImageProcessor::lineartr(Image<>* img) {
     unsigned long width = img->getWidth();
     unsigned long height = img->getHeight();
     unsigned long channels = img->getChannels();
@@ -215,7 +215,7 @@ Image* ImageProcessor::lineartr(Image* img) {
     }
 };
 
-Image* ImageProcessor::linearlut(Image* img) {
+Image<>* ImageProcessor::linearlut(Image<>* img) {
     unsigned long width = img->getWidth();
     unsigned long height = img->getHeight();
     unsigned long channels = img->getChannels();
@@ -263,7 +263,7 @@ Image* ImageProcessor::linearlut(Image* img) {
     }
 };
 
-Image* ImageProcessor::thresholdtr(Image* img){
+Image<>* ImageProcessor::thresholdtr(Image<>* img){
     unsigned long width, height, channels;
     width = img->getWidth();
     height = img->getHeight();
@@ -302,7 +302,7 @@ Image* ImageProcessor::thresholdtr(Image* img){
     }
 };
 
-Image* ImageProcessor::thresholdlut(Image* img){
+Image<>* ImageProcessor::thresholdlut(Image<>* img){
     unsigned long width, height, channels;
     width = img->getWidth();
     height = img->getHeight();
@@ -346,7 +346,7 @@ Image* ImageProcessor::thresholdlut(Image* img){
     }
 };
 
-Image* ImageProcessor::histogramtr(Image* img){
+Image<>* ImageProcessor::histogramtr(Image<>* img){
     std::vector<unsigned int> hist = img->getHistogram();
     unsigned long width, height, x, y;
     width = img->getWidth();
@@ -378,5 +378,8 @@ Image* ImageProcessor::histogramtr(Image* img){
     }
     return img;
 };
+
+
+
     
 

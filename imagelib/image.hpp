@@ -4,69 +4,83 @@
 #include <string>
 #include <vector>
 #include <cstdint>
+#include <iostream>
+#include <cmath>
+#include <algorithm>
 
-struct Pixel{
-		uint8_t r, g, b;
-	};
-
-class Image{
+class ImageBase {
 public:
-	// Image constructors
-	// Image(.. some info.., unsigned char* data); 
-	Image(
-	unsigned long width,
-	unsigned long length,
-	unsigned long channels,
-	unsigned long bpc,
-	unsigned char* data): _width(width), _length(length), _channels(channels), _bpc(bpc), _data(data){}
+    virtual ~ImageBase() {}  
 
-	virtual ~Image();
+    virtual unsigned long getWidth() const = 0;
+    virtual unsigned long getHeight() const = 0;
+    virtual unsigned long getChannels() const = 0;
+    virtual unsigned long getBpc() const = 0;
 
-	// File related
-	//virtual bool openFile() = 0; 
+    virtual void* getImageData() = 0; 
+};
 
-	// Get attributes
-	unsigned long getWidth();
-	unsigned long getHeight();
-	unsigned long getChannels();
-	unsigned long getBpc();
+template <typename T = uint8_t>
+struct Pixel {T r, g, b;};
 
-	// Image data related
-	unsigned char* getImageData();
+// made this so we could just have Image<float> objects and stuff
+template <typename T = uint8_t>
+class Image : public ImageBase {
+public:
+    Image(unsigned long width,
+          unsigned long height,
+          unsigned long channels,
+          unsigned long bpc,
+          T* data)
+        : _width(width), _height(height), _channels(channels), _bpc(bpc), _data(data) {}
 
-	// get/set Pixel methods?
-	
-	Pixel getPixel(int x, int y) const {
-		int idx = (y * _width + x) * _channels;
-		Pixel p;
-		p.r = _data[idx];
-		p.g = _data[idx+1];
-		p.b = _data[idx+2];
-		return p;
-	};
-	void setPixel(int x, int y, Pixel& p){
-		int idx = (y * _width + x) * _channels;
-		_data[idx] = p.r;
-		_data[idx+1] = p.g;
-		_data[idx+2] = p.b;
-	}
+    ~Image() override {
+        delete[] _data;
+    }
 
+    unsigned long getWidth() const override { return _width; }
+    unsigned long getHeight() const override { return _height; }
+    unsigned long getChannels() const override { return _channels; }
+    unsigned long getBpc() const override { return _bpc; }
 
-	// histogram - here using a std::vector
-	std::vector<unsigned int> getHistogram();
+    T* getImageData() override { return _data; }
 
-	void toUChar();
-	void toFloat();
+    Pixel<T> getPixel(int x, int y) const {
+        int idx = (y * _width + x) * _channels;
+        Pixel<T> p{};
+        p.r = _data[idx];
+        p.g = _data[idx + 1];
+        p.b = _data[idx + 2];
+        return p;
+    }
+
+    void setPixel(int x, int y, const Pixel<T>& p) {
+        int idx = (y * _width + x) * _channels;
+        _data[idx]     = p.r;
+        _data[idx + 1] = p.g;
+        _data[idx + 2] = p.b;
+    }
+
+    std::vector<unsigned int> getHistogram() const {
+        std::vector<unsigned int> histogram(256, 0);
+        for (unsigned long y = 0; y < _height; ++y) {
+            for (unsigned long x = 0; x < _width; ++x) {
+                Pixel<uint8_t> p = getPixel(x, y);
+                histogram[p.r]++;
+            }
+        }
+        return histogram;
+    }
 
 protected:
-	unsigned long _width{0};
-	unsigned long _length{0};
-	unsigned long _channels{0};
-	unsigned long _bpc{0};
+    unsigned long _width{0};
+    unsigned long _height{0};
+    unsigned long _channels{0};
+    unsigned long _bpc{0};
 
-	std::string _filename{};
-	
-	unsigned char* _data{nullptr};
-	float* _dataf{nullptr};
+    std::string _filename{};
+
+    T* _data{nullptr};
 };
+
 #endif
