@@ -21,7 +21,9 @@ public:
 };
 
 template <typename T = uint8_t>
-struct Pixel {T r, g, b;};
+struct Pixel {
+    T r, g, b;
+};
 
 // made this so we could just have Image<float> objects and stuff
 template <typename T = uint8_t>

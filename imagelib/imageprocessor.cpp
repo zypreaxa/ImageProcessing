@@ -417,34 +417,95 @@ Image<>* ImageProcessor::histogramtr(Image<>* img){
     return img;
 };
 
-// image conversion 8bit <-> float
-Image<float>* ImageProcessor::toFloat(Image<uint8_t>* img8){
-    size_t width, height;
-    unsigned long channels, bpc;
-    size_t size = width * height * channels * bpc / 8;
-    uint8_t* data8 = img8->getImageData();
-    float* fdata = new float[size];
-    for(size_t i=0; i<size; i++){
-        fdata[i] = data8[i] / 255.0f;
+Image<float>* ImageProcessor::toFloat(Image<uint8_t>* img8) {
+    size_t width    = img8->getWidth();
+    size_t height   = img8->getHeight();
+    size_t channels = img8->getChannels();
+    unsigned long bpc = img8->getBpc(); 
+
+    size_t nSamples = width * height * channels;
+
+    uint8_t* src = img8->getImageData();
+    float* dst = new float[nSamples];
+
+    for (size_t i = 0; i < nSamples; ++i) {
+        dst[i] = static_cast<float>(src[i]) / 255.0f;
     }
-    return new Image(width, height, channels, bpc, fdata); // this image object will need to be manually deleted to not cause a memory leak !!!
-};
-Image<uint8_t>* ImageProcessor::to8bit(Image<float>* imgf){
-    size_t width, height;
-    unsigned long channels, bpc;
-    size_t size = width * height * channels * bpc / 8;
-    float* dataf = imgf->getImageData();
-    uint8_t* data8 = new uint8_t[size];
-    uint8_t temp;
-    for(size_t i=0; i<size; i++){
-        //temp = dataf[i] * 255.0f;
-        temp = std::round(dataf[i]*255.0f); 
-        data8[i] = clamp<>(temp, uint8_t(0), uint8_t(255));
+
+    unsigned long floatBpc = 32;
+    return new Image<float>(width, height, channels, floatBpc, dst);
+}
+
+Image<uint8_t>* ImageProcessor::to8bit(Image<float>* imgf) {
+    size_t width    = imgf->getWidth();
+    size_t height   = imgf->getHeight();
+    size_t channels = imgf->getChannels();
+    size_t nSamples = width * height * channels;
+
+    float* src = imgf->getImageData();
+    uint8_t* dst = new uint8_t[nSamples];
+
+    for (size_t i = 0; i < nSamples; ++i) {
+        float v = clamp(src[i], 0.0f, 1.0f);
+        int rounded = static_cast<int>(std::round(v * 255.0f));
+        dst[i] = static_cast<uint8_t>(clamp(rounded, 0, 255));
     }
-    return new Image(width, height, channels, bpc, data8); // same with deleting this, don't forget :')
+
+    unsigned long outBpc = 8;
+    return new Image<uint8_t>(width, height, channels, outBpc, dst);
+}
+
+Image<uint8_t>* ImageProcessor::lowpass(Image<uint8_t>* img)
+{
+    size_t width    = img->getWidth();
+    size_t height   = img->getHeight();
+    size_t channels = img->getChannels();
+
+    if (channels != 1) {
+        std::cerr << "Error: lowpass() expects a grayscale image (1 channel)\n";
+        return nullptr;
+    }
+
+    // Convert to float first
+    Image<float>* imgf = toFloat(img);
+
+    // Allocate output float image
+    float* outBuf = new float[width * height]; // cause greyscale
+    Image<float>* outFloat = new Image<float>(width, height, 1, 32, outBuf);
+
+    for (size_t y = 0; y < height; ++y) {
+        for (size_t x = 0; x < width; ++x) {
+
+            float sum = 0.0f;
+            int count = 0;
+
+            // 3×3 neighborhood
+            for (int dy = -1; dy <= 1; ++dy) {
+                int ny = int(y) + dy;
+                if (ny < 0 || ny >= int(height)) continue;
+
+                for (int dx = -1; dx <= 1; ++dx) {
+                    int nx = int(x) + dx;
+                    if (nx < 0 || nx >= int(width)) continue;
+
+                    Pixel<float> p = imgf->getPixel(nx, ny);
+                    sum += p.r;       
+                    count++;
+                }
+            }
+
+            Pixel<float> outPix;
+            outPix.r = sum / float(count);
+
+            outFloat->setPixel(x, y, outPix);
+        }
+    }
+
+    // Convert back to 8-bit
+    Image<uint8_t>* result = to8bit(outFloat);
+
+    delete imgf;
+    delete outFloat;
+
+    return result;
 };
-
-
-
-    
-

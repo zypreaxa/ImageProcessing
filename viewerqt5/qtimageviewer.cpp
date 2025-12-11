@@ -130,6 +130,10 @@ void QtImageViewer::createActions(){
 	_toolsHistogrameq->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_H));
 	connect(_toolsHistogrameq, SIGNAL(triggered()), this, SLOT(histogrameq()));
 
+	_spatialLowpass = new QAction(tr("Lowpass filtering..."), this);
+	_spatialLowpass->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_S));
+	connect(_spatialLowpass, SIGNAL(triggered()), this, SLOT(lowpass()));
+
 	_fileMenu = menuBar()->addMenu(tr("&File"));
 	_fileMenu->addAction(_fileOpenAction);
 	_fileMenu->addAction(_fileClearAction);
@@ -148,6 +152,9 @@ void QtImageViewer::createActions(){
 	_toolsMenu->addAction(_toolsThresholding);
 	_toolsMenu->addAction(_toolsThresholdingLUT);
 	_toolsMenu->addAction(_toolsHistogrameq);
+	
+	_spatialMenu = menuBar()->addMenu(tr("&Spatial operations"));
+	_spatialMenu->addAction(_spatialLowpass);
 };
 
 void QtImageViewer::openFile(){
@@ -487,7 +494,19 @@ void QtImageViewer::histogrameq(){
 	delete img;
 };
 
+void QtImageViewer::lowpass(){
+	ImageProcessor processor;
+	QString filename = QFileDialog::getOpenFileName(this, "Select image for lowpass filtering...");
+	if(filename.isEmpty()) return;
 
+	TiffLoader trloader = (filename.toStdString());
+	Image<>* img = trloader.loadImage();
+
+	Image<>* filtered = processor.lowpass(img);
+	showImageRight(filtered);
+	delete img;
+	delete filtered;
+}
 
 void QtImageViewer::quit(){
 	close();

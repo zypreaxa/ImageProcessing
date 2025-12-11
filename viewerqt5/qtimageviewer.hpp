@@ -42,6 +42,7 @@ public slots:
 	void thresholding();
 	void thresholdingLUT();
 	void histogrameq();
+	void lowpass();
 private:
 	enum ImageView{
 		NONE = 0,
@@ -90,7 +91,9 @@ private:
 	QAction *_toolsThresholding{nullptr};
 	QAction *_toolsThresholdingLUT{nullptr};
 	QAction *_toolsHistogrameq{nullptr};
-	
+
+	QMenu *_spatialMenu{nullptr};
+	QAction *_spatialLowpass{nullptr};
 };
 
 #endif

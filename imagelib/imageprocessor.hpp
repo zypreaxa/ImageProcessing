@@ -26,10 +26,12 @@ public:
     static Image<>* thresholdtr(Image<>* img);
     static Image<>* thresholdlut(Image<>* img);
     static Image<>* histogramtr(Image<>* img);
-    static Image<>* lowpass(Image<>* img);    
 
     static Image<float>* toFloat(Image<uint8_t>* img8);
     static Image<uint8_t>* to8bit(Image<float>* imgf);
+
+    static Image<>* lowpass(Image<>* img);    
+
 
 private:
 // my compiler is ancient so had to make my own clamp lol
