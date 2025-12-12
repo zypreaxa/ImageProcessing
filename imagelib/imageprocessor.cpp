@@ -1,5 +1,4 @@
 #include "imageprocessor.hpp"
-#include <algorithm>
 #include <cmath>
 #include <iostream>
 
@@ -13,7 +12,7 @@ Image<>* ImageProcessor::combineRGB(
         return nullptr;
     } // checking for errors
 
-    unsigned long width = red->getWidth();
+    unsigned char width = red->getWidth();
     unsigned long height = red->getHeight();
     unsigned long bpc = red->getBpc(); // this assumes that all 3 images are the same size
     unsigned long channels = 3;
@@ -29,7 +28,7 @@ Image<>* ImageProcessor::combineRGB(
         }
     }
 
-    Image<>* out = new Image(width, height, channels, bpc, data);
+    Image<>* out = new Image<>(width, height, channels, bpc, data);
     return out;
 };
 
@@ -72,7 +71,7 @@ Image<>* ImageProcessor::negationtr(Image<>* img){
 
         for(size_t y=0; y<height; ++y){
             for(size_t x=0; x<width; ++x){
-                Pixel p = img->getPixel(x, y);
+                Pixel<> p = img->getPixel(x, y);
                 p.r = 255 - p.r; // since red has the first index, it is the representation of grey in greyscale
 
                 img->setPixel(x, y, p);            
@@ -86,7 +85,7 @@ Image<>* ImageProcessor::negationtr(Image<>* img){
         
         for(size_t y=0; y<height; y++){
             for(size_t x=0; x<width; x++){
-                Pixel p = img->getPixel(x, y);
+                Pixel<> p = img->getPixel(x, y);
                 p.r = 255 - p.r;
                 p.g = 255 - p.g;
                 p.b = 255 - p.b;
@@ -112,7 +111,7 @@ Image<>* ImageProcessor::negationlut(Image<>* img){
 
     for(size_t y=0; y<height; ++y){
         for(size_t x=0; x<width; ++x){
-            Pixel p = img->getPixel(x, y);
+            Pixel<> p = img->getPixel(x, y);
             p.r = lut[p.r];
             p.g = lut[p.r];
             p.b = lut[p.r];
@@ -134,7 +133,7 @@ Image<>* ImageProcessor::powerlawtr(Image<>* img){
     if(channels==1){
         for(int y=0; y<height; y++){
             for(int x=0; x<width; x++){
-                Pixel p = img->getPixel(x, y);
+                Pixel<> p = img->getPixel(x, y);
                 p.r = 255.0 * std::pow(p.r / 255.0, gamma);
                 img->setPixel(x, y, p);
             }
@@ -144,7 +143,7 @@ Image<>* ImageProcessor::powerlawtr(Image<>* img){
     else if(channels==3){  // completely incorrect lol
         for(int y=0; y<height; y++){
             for(int x=0; x<width; x++){
-                Pixel p = img->getPixel(x, y);
+                Pixel<> p = img->getPixel(x, y);
                 p.r = p.r ^ gamma;
                 p.g = p.g ^ gamma;
                 p.b = p.b ^ gamma;
@@ -176,10 +175,8 @@ Image<>* ImageProcessor::powerlawlut(Image<>* img){
 
         for(int y=0; y<height; y++){
             for(int x=0; x<width; x++){
-                Pixel p = img->getPixel(x, y);
+                Pixel<> p = img->getPixel(x, y);
                 p.r = lut[p.r];
-                p.g = lut[p.r];
-                p.b = lut[p.r];
                 img->setPixel(x, y, p);
             }
         }
@@ -188,7 +185,7 @@ Image<>* ImageProcessor::powerlawlut(Image<>* img){
     else if(channels==3){  // completely incorrect lol
         for(int y=0; y<height; y++){
             for(int x=0; x<width; x++){
-                Pixel p = img->getPixel(x, y);
+                Pixel<> p = img->getPixel(x, y);
                 p.r = p.r ^ gamma;
                 p.g = p.g ^ gamma;
                 p.b = p.b ^ gamma;
@@ -217,7 +214,7 @@ Image<>* ImageProcessor::lineartr(Image<>* img) {
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
 
-                Pixel p = img->getPixel(x, y);
+                Pixel<> p = img->getPixel(x, y);
                 double r = p.r;
                 double s;
 
@@ -234,7 +231,7 @@ Image<>* ImageProcessor::lineartr(Image<>* img) {
                 }
 
                 // Clamp
-                s = std::clamp(s, 0.0, 255.0);
+                s = clamp(s, 0.0, 255.0);
                 p.r = (unsigned char)s;
                 img->setPixel(x, y, p);
             }
@@ -276,13 +273,12 @@ Image<>* ImageProcessor::linearlut(Image<>* img) {
                 s = m * (r - r2) + s2;
             }
 
-                // Clamp
-            s = std::clamp(s, 0.0, 255.0);
+            s = clamp(s, 0.0, 255.0);
             lut[k]= static_cast<uint8_t>(std::round(s));
         }
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
-                Pixel p = img->getPixel(x, y);
+                Pixel<> p = img->getPixel(x, y);
                 p.r = lut[p.r];
                 p.g = lut[p.r];
                 p.b = lut[p.r];
@@ -313,7 +309,7 @@ Image<>* ImageProcessor::thresholdtr(Image<>* img){
     if(channels==1){
         for(int y=0; y<height; y++){
             for(int x=0; x<width; x++){
-                Pixel p = img->getPixel(x, y);
+                Pixel<> p = img->getPixel(x, y);
                 if(p.r <= r1){
                     newval=s0+((s1-s0)/(r1-r0))*(p.r - r0);
                 } 
@@ -323,7 +319,7 @@ Image<>* ImageProcessor::thresholdtr(Image<>* img){
                 else{
                     newval=s3+((s3-s2)/(r3-r2))*(p.r - r2);
                 }
-                std::clamp(newval, 0, 255);
+                clamp(newval, 0, 255);
                 p.r = (unsigned char) newval;
                 img->setPixel(x, y, p);
             }
@@ -360,14 +356,14 @@ Image<>* ImageProcessor::thresholdlut(Image<>* img){
         else{
             newval=s3+((s3-s2)/(r3-r2))*(k - r2);
         }
-        std::clamp(newval, 0, 255);
+        clamp(newval, 0, 255);
         lut[k] = static_cast<uint8_t>(newval);
     }
 
     if(channels==1){
         for(int y=0; y<height; y++){
             for(int x=0; x<width; x++){
-                Pixel p = img->getPixel(x, y);
+                Pixel<> p = img->getPixel(x, y);
                 p.r = lut[p.r];
                 p.g = lut[p.r];
                 p.b = lut[p.b];
@@ -407,7 +403,7 @@ Image<>* ImageProcessor::histogramtr(Image<>* img){
 
     for(y=0; y<height; y++){
         for(x=0; x<width; x++){
-            Pixel p = img->getPixel(x, y);
+            Pixel<> p = img->getPixel(x, y);
             p.r = lut[p.r];
             p.g = lut[p.r];
             p.b = lut[p.r];
@@ -418,8 +414,8 @@ Image<>* ImageProcessor::histogramtr(Image<>* img){
 };
 
 Image<float>* ImageProcessor::toFloat(Image<uint8_t>* img8) {
-    size_t width    = img8->getWidth();
-    size_t height   = img8->getHeight();
+    size_t width = img8->getWidth();
+    size_t height = img8->getHeight();
     size_t channels = img8->getChannels();
     unsigned long bpc = img8->getBpc(); 
 
@@ -501,7 +497,6 @@ Image<uint8_t>* ImageProcessor::lowpass(Image<uint8_t>* img)
         }
     }
 
-    // Convert back to 8-bit
     Image<uint8_t>* result = to8bit(outFloat);
 
     delete imgf;

@@ -153,7 +153,7 @@ void QtImageViewer::createActions(){
 	_toolsMenu->addAction(_toolsThresholdingLUT);
 	_toolsMenu->addAction(_toolsHistogrameq);
 	
-	_spatialMenu = menuBar()->addMenu(tr("&Spatial operations"));
+	_spatialMenu = menuBar()->addMenu(tr("&Spatial filtering"));
 	_spatialMenu->addAction(_spatialLowpass);
 };
 

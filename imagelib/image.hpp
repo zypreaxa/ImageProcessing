@@ -4,9 +4,6 @@
 #include <string>
 #include <vector>
 #include <cstdint>
-#include <iostream>
-#include <cmath>
-#include <algorithm>
 
 class ImageBase {
 public:
@@ -17,7 +14,7 @@ public:
     virtual unsigned long getChannels() const = 0;
     virtual unsigned long getBpc() const = 0;
 
-    virtual void* getImageData() = 0; 
+    virtual void* getRawData() = 0; 
 };
 
 template <typename T = uint8_t>
@@ -45,7 +42,9 @@ public:
     unsigned long getChannels() const override { return _channels; }
     unsigned long getBpc() const override { return _bpc; }
 
-    T* getImageData() override { return _data; }
+    void* getRawData() override { return _data; };
+
+    T* getImageData(){ return _data; }
 
     Pixel<T> getPixel(int x, int y) const {
         int idx = (y * _width + x) * _channels;
