@@ -1,4 +1,5 @@
 #include "imageprocessor.hpp"
+#include <algorithm>
 #include <cmath>
 #include <iostream>
 
@@ -463,7 +464,7 @@ Image<uint8_t>* ImageProcessor::lowpass(Image<uint8_t>* img)
     }
 
     // Convert to float first
-    Image<float>* imgf = toFloat(img);
+    Image<float>* imgf = ImageProcessor::toFloat(img);
 
     // Allocate output float image
     float* outBuf = new float[width * height]; // cause greyscale
@@ -502,5 +503,64 @@ Image<uint8_t>* ImageProcessor::lowpass(Image<uint8_t>* img)
     delete imgf;
     delete outFloat;
 
+    return result;
+};
+
+float med (std::vector<float> neighborhood){
+    size_t size = neighborhood.size();
+    std::sort(neighborhood.begin(), neighborhood.end());
+    if(neighborhood.size() % 2 == 0){
+        return (neighborhood[size / 2 - 1] + neighborhood[size / 2]) / 2;
+    }
+    else{
+        return neighborhood[size / 2];
+    }
+}; 
+
+
+Image<uint8_t>* ImageProcessor::median(Image<uint8_t>* img){
+    size_t width = img->getWidth();
+    size_t height = img->getHeight();
+    size_t channels = img->getChannels();
+
+    if(channels!=1){
+        std::cerr << "Image is not greyscale.\n";
+        return nullptr;
+    }
+
+    Image<float>* imgf = ImageProcessor::toFloat(img);
+    float* outbuff = new float[width * height];
+    Image<float>* outfloat = new Image<float>(width, height, 1, 32, outbuff);
+    std::vector<float> neighborhood;
+    float median = 0.0f;
+
+    for(size_t y=0; y<height; y++){
+        for(size_t x=0; x<width; x++){
+            float sum = 0.0f;
+            float count = 0;
+            
+            for(int dy=-1; dy<=1; ++dy){
+                int ny = int(y) + dy;
+                if(ny<0 || ny>height) continue;
+                for(int dx=-1; dx<=1; ++dx){
+                    int nx = int(x) + dx;
+                    if(nx<0 || nx>width) continue;
+                    Pixel<float> p = imgf->getPixel(nx, ny);
+                    neighborhood.push_back(p.r);
+                    // here you just add each pixel into a vector, then pass the vector to a function that 
+                    // will calculate the median value of this neighborhood, and then change the pixel value
+                    // to that value.
+                }
+            }
+            Pixel<float> out;
+            out.r = med(neighborhood);
+            outfloat->setPixel(x, y, out);
+            neighborhood.clear();
+        }
+
+    }
+    Image<uint8_t>* result = ImageProcessor::to8bit(outfloat);
+    delete imgf;
+    delete outfloat;
     return result;
 };

@@ -30,7 +30,8 @@ public:
     static Image<float>* toFloat(Image<uint8_t>* img8);
     static Image<uint8_t>* to8bit(Image<float>* imgf);
 
-    static Image<>* lowpass(Image<>* img);    
+    static Image<>* lowpass(Image<>* img);  
+    static Image<>* median(Image<>* img); 
 
 
 private:

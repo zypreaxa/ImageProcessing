@@ -134,6 +134,10 @@ void QtImageViewer::createActions(){
 	_spatialLowpass->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_S));
 	connect(_spatialLowpass, SIGNAL(triggered()), this, SLOT(lowpass()));
 
+	_spatialMedian = new QAction(tr("Median filtering..."), this);
+	_spatialMedian->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_M));
+	connect(_spatialMedian, SIGNAL(triggered()), this, SLOT(median()));
+
 	_fileMenu = menuBar()->addMenu(tr("&File"));
 	_fileMenu->addAction(_fileOpenAction);
 	_fileMenu->addAction(_fileClearAction);
@@ -155,6 +159,7 @@ void QtImageViewer::createActions(){
 	
 	_spatialMenu = menuBar()->addMenu(tr("&Spatial filtering"));
 	_spatialMenu->addAction(_spatialLowpass);
+	_spatialMenu->addAction(_spatialMedian);
 };
 
 void QtImageViewer::openFile(){
@@ -506,7 +511,20 @@ void QtImageViewer::lowpass(){
 	showImageRight(filtered);
 	delete img;
 	delete filtered;
-}
+};
+void QtImageViewer::median(){
+	ImageProcessor processor;
+	QString filename = QFileDialog::getOpenFileName(this, "Select image for median filtering...");
+	if(filename.isEmpty()) return;
+
+	TiffLoader trloader = (filename.toStdString());
+	Image<>* img = trloader.loadImage();
+
+	Image<>* filtered = processor.median(img);
+	showImageRight(filtered);
+	delete img;
+	delete filtered;
+};
 
 void QtImageViewer::quit(){
 	close();
