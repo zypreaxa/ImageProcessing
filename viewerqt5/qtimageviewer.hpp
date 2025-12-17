@@ -12,8 +12,6 @@
 
 #include <image.hpp>
 
-#include <vector>
-
 class QtImageViewer : public QMainWindow{
 
 	Q_OBJECT
@@ -44,6 +42,7 @@ public slots:
 	void histogrameq();
 	void lowpass();
 	void median();
+	void laplacian();
 private:
 	enum ImageView{
 		NONE = 0,
@@ -96,6 +95,7 @@ private:
 	QMenu *_spatialMenu{nullptr};
 	QAction *_spatialLowpass{nullptr};
 	QAction *_spatialMedian{nullptr};
+	QAction *_spatialLaplacian{nullptr};
 };
 
 #endif

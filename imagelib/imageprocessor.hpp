@@ -32,7 +32,7 @@ public:
 
     static Image<>* lowpass(Image<>* img);  
     static Image<>* median(Image<>* img); 
-
+    static Image<>* laplacian(Image<>* img);
 
 private:
 // my compiler is ancient so had to make my own clamp lol

@@ -55,6 +55,11 @@ public:
         return p;
     }
 
+    T getPixelValue(int x, int y) const {
+        int idx = (y * _width + x) * _channels;
+        return _data[idx];
+    }
+
     void setPixel(int x, int y, const Pixel<T>& p) {
         int idx = (y * _width + x) * _channels;
         _data[idx]     = p.r;

@@ -138,6 +138,10 @@ void QtImageViewer::createActions(){
 	_spatialMedian->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_M));
 	connect(_spatialMedian, SIGNAL(triggered()), this, SLOT(median()));
 
+	_spatialLaplacian = new QAction(tr("Laplacian transform..."), this);
+	_spatialLaplacian->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_X));
+	connect(_spatialLaplacian, SIGNAL(triggered()), this, SLOT(laplacian()));
+
 	_fileMenu = menuBar()->addMenu(tr("&File"));
 	_fileMenu->addAction(_fileOpenAction);
 	_fileMenu->addAction(_fileClearAction);
@@ -160,6 +164,7 @@ void QtImageViewer::createActions(){
 	_spatialMenu = menuBar()->addMenu(tr("&Spatial filtering"));
 	_spatialMenu->addAction(_spatialLowpass);
 	_spatialMenu->addAction(_spatialMedian);
+	_spatialMenu->addAction(_spatialLaplacian);
 };
 
 void QtImageViewer::openFile(){
@@ -521,6 +526,19 @@ void QtImageViewer::median(){
 	Image<>* img = trloader.loadImage();
 
 	Image<>* filtered = processor.median(img);
+	showImageRight(filtered);
+	delete img;
+	delete filtered;
+};
+void QtImageViewer::laplacian(){
+	ImageProcessor processor;
+	QString filename = QFileDialog::getOpenFileName(this, "Select image for laplacian transform...");
+	if(filename.isEmpty()) return;
+
+	TiffLoader trloader = (filename.toStdString());
+	Image<>* img = trloader.loadImage();
+
+	Image<>* filtered = processor.laplacian(img);
 	showImageRight(filtered);
 	delete img;
 	delete filtered;

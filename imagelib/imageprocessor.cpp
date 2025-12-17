@@ -535,10 +535,7 @@ Image<uint8_t>* ImageProcessor::median(Image<uint8_t>* img){
     float median = 0.0f;
 
     for(size_t y=0; y<height; y++){
-        for(size_t x=0; x<width; x++){
-            float sum = 0.0f;
-            float count = 0;
-            
+        for(size_t x=0; x<width; x++){            
             for(int dy=-1; dy<=1; ++dy){
                 int ny = int(y) + dy;
                 if(ny<0 || ny>height) continue;
@@ -558,6 +555,38 @@ Image<uint8_t>* ImageProcessor::median(Image<uint8_t>* img){
             neighborhood.clear();
         }
 
+    }
+    Image<uint8_t>* result = ImageProcessor::to8bit(outfloat);
+    delete imgf;
+    delete outfloat;
+    return result;
+};
+
+Image<>* ImageProcessor::laplacian(Image<>* img){
+    size_t width = img->getWidth();
+    size_t height = img->getHeight();
+    size_t channels = img->getChannels();
+
+    float c = 1; // constant for explicit control over the strength of the transform
+    
+    if(channels!=1){
+        std::cerr << "Selected image is not greyscale.\n";
+        return nullptr;
+    }
+    Image<float>* imgf = ImageProcessor::toFloat(img);
+    float* dataf = imgf->getImageData();
+    float* outbuff = new float[width * height];
+    Image<float>* outfloat = new Image<float>(width, height, 1, 32, outbuff);
+
+    for(size_t y=1; y<height-1; y++){
+        for(size_t x=1; x<width-1; x++){
+            float lapval = imgf->getPixelValue(x+1,y)+imgf->getPixelValue(x-1,y)
+            +imgf->getPixelValue(x,y+1)+imgf->getPixelValue(x,y-1)
+            -4.0f*imgf->getPixelValue(x,y); // discrete Laplacian mask for axial derivatives
+            Pixel<float> out;
+            out.r = out.b = out.g = imgf->getPixelValue(x, y)-c*lapval; // laplacian sharpening by subtracting laplacian value from original value
+            outfloat->setPixel(x, y, out);
+        }
     }
     Image<uint8_t>* result = ImageProcessor::to8bit(outfloat);
     delete imgf;
