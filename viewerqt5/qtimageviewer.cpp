@@ -22,8 +22,6 @@ QtImageViewer::QtImageViewer(QWidget *parent) :
 };
 
 void QtImageViewer::init(){
-
-
 	_lImageLabel = new QLabel;
 	_lImageLabel->setBackgroundRole(QPalette::Base);
 	_lImageLabel->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
@@ -67,6 +65,8 @@ QtImageViewer::~QtImageViewer(){
 	delete(_fileOpenAction);
 	delete(_fileClearAction);
 	delete(_quitAction);
+
+	delete(_currentImage);
 };
 
 void QtImageViewer::createActions(){
@@ -83,52 +83,52 @@ void QtImageViewer::createActions(){
 	_quitAction->setShortcut(QKeySequence::Quit);
 	connect(_quitAction, SIGNAL(triggered()), this, SLOT(quit()));
 
-	_toolsFourierTransform = new QAction(tr("&Fourier transform..."), this);
-	_toolsFourierTransform->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_F));
+	_trFourierTransform = new QAction(tr("&Fourier transform..."), this);
+	_trFourierTransform->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_F));
 
-	_toolsTogreyscale = new QAction(tr("Convert image to greyscale..."), this);
-	_toolsTogreyscale->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_G));
-	connect(_toolsTogreyscale, SIGNAL(triggered()), this, SLOT(togreyscale()));
+	_trTogreyscale = new QAction(tr("Convert image to greyscale..."), this);
+	_trTogreyscale->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_G));
+	connect(_trTogreyscale, SIGNAL(triggered()), this, SLOT(togreyscale()));
 
-	_toolsCombine = new QAction(tr("&Combine images into RGB..."), this);
-	_toolsCombine->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_C));
-	connect(_toolsCombine, SIGNAL(triggered()), this, SLOT(combineImagesRGB()));
+	_trCombine = new QAction(tr("&Combine images into RGB..."), this);
+	_trCombine->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_C));
+	connect(_trCombine, SIGNAL(triggered()), this, SLOT(combineImagesRGB()));
 	
-	_toolsNegate = new QAction(tr("Image negation..."), this);
-	_toolsNegate->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_N));
-	connect(_toolsNegate, SIGNAL(triggered()), this, SLOT(negate()));
+	_trNegate = new QAction(tr("Image negation..."), this);
+	_trNegate->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_N));
+	connect(_trNegate, SIGNAL(triggered()), this, SLOT(negate()));
 
-	_toolsNegateLUT = new QAction(tr("Image negation using LUT..."), this);
-	_toolsNegateLUT->setShortcut(QKeySequence(Qt::SHIFT | Qt::Key_N));
-	connect(_toolsNegateLUT, SIGNAL(triggered()), this, SLOT(negateLUT()));
+	_trNegateLUT = new QAction(tr("Image negation using LUT..."), this);
+	_trNegateLUT->setShortcut(QKeySequence(Qt::SHIFT | Qt::Key_N));
+	connect(_trNegateLUT, SIGNAL(triggered()), this, SLOT(negateLUT()));
 
-	_toolsPowerlaw = new QAction(tr("Power law..."), this);
-	_toolsPowerlaw->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_P));
-	connect(_toolsPowerlaw, SIGNAL(triggered()), this, SLOT(powerlaw()));
+	_trPowerlaw = new QAction(tr("Power law..."), this);
+	_trPowerlaw->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_P));
+	connect(_trPowerlaw, SIGNAL(triggered()), this, SLOT(powerlaw()));
 
-	_toolsPowerlawLUT = new QAction(tr("Power law using LUT..."), this);
-	_toolsPowerlawLUT->setShortcut(QKeySequence(Qt::SHIFT | Qt::Key_P));
-	connect(_toolsPowerlawLUT, SIGNAL(triggered()), this, SLOT(powerlawLUT()));
+	_trPowerlawLUT = new QAction(tr("Power law using LUT..."), this);
+	_trPowerlawLUT->setShortcut(QKeySequence(Qt::SHIFT | Qt::Key_P));
+	connect(_trPowerlawLUT, SIGNAL(triggered()), this, SLOT(powerlawLUT()));
 
-	_toolsLinear = new QAction(tr("Piece-wise linear..."), this);
-	_toolsLinear->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_L));
-	connect(_toolsLinear, SIGNAL(triggered()), this, SLOT(linear()));
+	_trLinear = new QAction(tr("Piece-wise linear..."), this);
+	_trLinear->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_L));
+	connect(_trLinear, SIGNAL(triggered()), this, SLOT(linear()));
 
-	_toolsLinearLUT = new QAction(tr("Linear using LUT..."), this);
-	_toolsLinearLUT->setShortcut(QKeySequence(Qt::SHIFT | Qt::Key_L));
-	connect(_toolsLinearLUT, SIGNAL(triggered()), this, SLOT(linearLUT()));
+	_trLinearLUT = new QAction(tr("Linear using LUT..."), this);
+	_trLinearLUT->setShortcut(QKeySequence(Qt::SHIFT | Qt::Key_L));
+	connect(_trLinearLUT, SIGNAL(triggered()), this, SLOT(linearLUT()));
 
-	_toolsThresholding = new QAction(tr("Thresholding..."), this);
-	_toolsThresholding->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_T));
-	connect(_toolsThresholding, SIGNAL(triggered()), this, SLOT(thresholding()));
+	_trThresholding = new QAction(tr("Thresholding..."), this);
+	_trThresholding->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_T));
+	connect(_trThresholding, SIGNAL(triggered()), this, SLOT(thresholding()));
 
-	_toolsThresholdingLUT = new QAction(tr("Thresholding using LUT..."), this);
-	_toolsThresholdingLUT->setShortcut(QKeySequence(Qt::SHIFT | Qt::Key_T));
-	connect(_toolsThresholdingLUT, SIGNAL(triggered()), this, SLOT(thresholdingLUT()));
+	_trThresholdingLUT = new QAction(tr("Thresholding using LUT..."), this);
+	_trThresholdingLUT->setShortcut(QKeySequence(Qt::SHIFT | Qt::Key_T));
+	connect(_trThresholdingLUT, SIGNAL(triggered()), this, SLOT(thresholdingLUT()));
 
-	_toolsHistogrameq = new QAction(tr("Histogram equalization..."), this);
-	_toolsHistogrameq->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_H));
-	connect(_toolsHistogrameq, SIGNAL(triggered()), this, SLOT(histogrameq()));
+	_trHistogrameq = new QAction(tr("Histogram equalization..."), this);
+	_trHistogrameq->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_H));
+	connect(_trHistogrameq, SIGNAL(triggered()), this, SLOT(histogrameq()));
 
 	_spatialLowpass = new QAction(tr("Lowpass filtering..."), this);
 	_spatialLowpass->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_S));
@@ -147,24 +147,26 @@ void QtImageViewer::createActions(){
 	_fileMenu->addAction(_fileClearAction);
 	_fileMenu->addAction(_quitAction);
 
-	_toolsMenu = menuBar()->addMenu(tr("&Tools"));
-	_toolsMenu->addAction(_toolsFourierTransform);
-	_toolsMenu->addAction(_toolsTogreyscale);
-	_toolsMenu->addAction(_toolsCombine);
-	_toolsMenu->addAction(_toolsNegate);
-	_toolsMenu->addAction(_toolsNegateLUT);
-	_toolsMenu->addAction(_toolsPowerlaw);
-	_toolsMenu->addAction(_toolsPowerlawLUT);
-	_toolsMenu->addAction(_toolsLinear);
-	_toolsMenu->addAction(_toolsLinearLUT);
-	_toolsMenu->addAction(_toolsThresholding);
-	_toolsMenu->addAction(_toolsThresholdingLUT);
-	_toolsMenu->addAction(_toolsHistogrameq);
+	_trMenu = menuBar()->addMenu(tr("&Transforms"));
+	_trMenu->addAction(_trFourierTransform);
+	_trMenu->addAction(_trTogreyscale);
+	_trMenu->addAction(_trCombine);
+	_trMenu->addAction(_trNegate);
+	_trMenu->addAction(_trNegateLUT);
+	_trMenu->addAction(_trPowerlaw);
+	_trMenu->addAction(_trPowerlawLUT);
+	_trMenu->addAction(_trLinear);
+	_trMenu->addAction(_trLinearLUT);
+	_trMenu->addAction(_trThresholding);
+	_trMenu->addAction(_trThresholdingLUT);
+	_trMenu->addAction(_trHistogrameq);
 	
 	_spatialMenu = menuBar()->addMenu(tr("&Spatial filtering"));
 	_spatialMenu->addAction(_spatialLowpass);
 	_spatialMenu->addAction(_spatialMedian);
 	_spatialMenu->addAction(_spatialLaplacian);
+
+	_toolsMenu = menuBar()->addMenu(tr("&Tools"));
 };
 
 void QtImageViewer::openFile(){
@@ -304,17 +306,13 @@ void QtImageViewer::showImageRight(Image<> *img) {
 	showImage(img, ImageView::RIGHT);
 };
 
-void QtImageViewer::clearFile() {
-
-	_lImageLabel->clear();
-	_lScrollArea->setVisible(false);
-
-	_rImageLabel->clear();
-	_rScrollArea->setVisible(false);
-	_imageState = 0;
-
-	update();
+void QtImageViewer::setCurrentImage(Image<uint8_t>* img){
+	if(img){
+		_currentImage = img;
+	}
 };
+
+void QtImageViewer::clearFile(){};
 
 void QtImageViewer::togreyscale(){
 	ImageProcessor processor;
@@ -393,8 +391,7 @@ void QtImageViewer::negate() {
 
 	processor.negationtr(img);
 	showImageRight(img);
-
-	delete img;
+	delete img; // make this work somehow with qt getting ownership of the image. Maybe also merge functions somehow?
 };
 
 void QtImageViewer::negateLUT() {

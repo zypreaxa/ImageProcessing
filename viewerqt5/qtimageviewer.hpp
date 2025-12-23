@@ -59,6 +59,8 @@ private:
 	unsigned int _imageState{ImageView::NONE};
 
 	void showImage(Image<uint8_t>* img, ImageView view);
+
+	void setCurrentImage(Image<uint8_t>* img);
 	
 	QImage _lImage;
 	QLabel *_lImageLabel{nullptr};
@@ -78,24 +80,28 @@ private:
 	QAction *_quitAction{nullptr};
 	
 
-	QMenu *_toolsMenu{nullptr};
-	QAction *_toolsFourierTransform{nullptr};
-	QAction *_toolsTogreyscale{nullptr};
-	QAction *_toolsCombine{nullptr};
-	QAction *_toolsNegate{nullptr};
-	QAction *_toolsNegateLUT{nullptr};
-	QAction *_toolsPowerlaw{nullptr};
-	QAction *_toolsPowerlawLUT{nullptr};
-	QAction *_toolsLinear{nullptr};
-	QAction *_toolsLinearLUT{nullptr};
-	QAction *_toolsThresholding{nullptr};
-	QAction *_toolsThresholdingLUT{nullptr};
-	QAction *_toolsHistogrameq{nullptr};
+	QMenu *_trMenu{nullptr};
+	QAction *_trFourierTransform{nullptr};
+	QAction *_trTogreyscale{nullptr};
+	QAction *_trCombine{nullptr};
+	QAction *_trNegate{nullptr};
+	QAction *_trNegateLUT{nullptr};
+	QAction *_trPowerlaw{nullptr};
+	QAction *_trPowerlawLUT{nullptr};
+	QAction *_trLinear{nullptr};
+	QAction *_trLinearLUT{nullptr};
+	QAction *_trThresholding{nullptr};
+	QAction *_trThresholdingLUT{nullptr};
+	QAction *_trHistogrameq{nullptr};
 
 	QMenu *_spatialMenu{nullptr};
 	QAction *_spatialLowpass{nullptr};
 	QAction *_spatialMedian{nullptr};
 	QAction *_spatialLaplacian{nullptr};
+
+	QMenu *_toolsMenu{nullptr};
+
+	Image<uint8_t> *_currentImage{nullptr};
 };
 
 #endif
