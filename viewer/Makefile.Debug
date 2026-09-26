@@ -5,7 +5,7 @@
 # Template: app
 #############################################################################
 
-MAKEFILE      = Makefile.Release
+MAKEFILE      = Makefile.Debug
 
 EQ            = =
 
@@ -13,11 +13,11 @@ EQ            = =
 
 CC            = gcc
 CXX           = g++
-DEFINES       = -DQT_NO_DEBUG -DQT_CHARTS_LIB -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB
-CFLAGS        = -pipe -O2 -D_REENTRANT -flto -fno-fat-lto-objects -Wall -Wextra -fPIC $(DEFINES)
-CXXFLAGS      = -pipe -O2 -std=gnu++11 -D_REENTRANT -flto -fno-fat-lto-objects -Wall -Wextra -fPIC $(DEFINES)
-INCPATH       = -I. -I. -I.. -I../imagelib -I/usr/include/qt -I/usr/include/qt/QtCharts -I/usr/include/qt/QtWidgets -I/usr/include/qt/QtGui -I/usr/include/qt/QtCore -Irelease -I/usr/lib/qt/mkspecs/linux-g++
-QMAKE         = /usr/bin/qmake-qt5
+DEFINES       = -DQT_CHARTS_LIB -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB
+CFLAGS        = -pipe -g -D_REENTRANT -Wall -Wextra -fPIC $(DEFINES)
+CXXFLAGS      = -pipe -g -std=gnu++11 -D_REENTRANT -Wall -Wextra -fPIC $(DEFINES)
+INCPATH       = -I. -I. -I.. -I../imagelib -I/usr/include/qt -I/usr/include/qt/QtCharts -I/usr/include/qt/QtWidgets -I/usr/include/qt/QtGui -I/usr/include/qt/QtCore -Idebug -I/usr/lib/qt/mkspecs/linux-g++
+QMAKE         = /usr/bin/qmake
 DEL_FILE      = rm -f
 CHK_DIR_EXISTS= test -d
 MKDIR         = mkdir -p
@@ -27,8 +27,8 @@ COPY_DIR      = cp -f -R
 INSTALL_FILE  = install -m 644 -p
 INSTALL_PROGRAM = install -m 755 -p
 INSTALL_DIR   = cp -f -R
-QINSTALL      = /usr/bin/qmake-qt5 -install qinstall
-QINSTALL_PROGRAM = /usr/bin/qmake-qt5 -install qinstall -exe
+QINSTALL      = /usr/bin/qmake -install qinstall
+QINSTALL_PROGRAM = /usr/bin/qmake -install qinstall -exe
 DEL_FILE      = rm -f
 SYMLINK       = ln -f -s
 DEL_DIR       = rmdir
@@ -36,26 +36,26 @@ MOVE          = mv -f
 TAR           = tar -cf
 COMPRESS      = gzip -9f
 DISTNAME      = viewer1.0.0
-DISTDIR = /home/zypreaxa/Projects/ImageProcessing/viewerqt5/release/viewer1.0.0
+DISTDIR = /home/zypreaxa/Projects/ImageProcessing/viewer/debug/viewer1.0.0
 LINK          = g++
-LFLAGS        = -Wl,-O1 -pipe -O2 -std=gnu++11 -flto=12 -fno-fat-lto-objects -fuse-linker-plugin -fPIC
-LIBS          = $(SUBLIBS) -L../imagelib/ -limagelib -ltiff -Wl,-rpath,../imagelib /usr/lib/libQt5Charts.so /usr/lib/libQt5Widgets.so /usr/lib/libQt5Gui.so /usr/lib/libQt5Core.so -lGL -lpthread   
-AR            = gcc-ar cqs
+LFLAGS        = -fPIC
+LIBS          = $(SUBLIBS) -L../imagelib/ -limagelib -ltiff /usr/lib/libQt5Charts.so /usr/lib/libQt5Widgets.so /usr/lib/libQt5Gui.so /usr/lib/libQt5Core.so -lGL -lpthread   
+AR            = ar cqs
 RANLIB        = 
 SED           = sed
 STRIP         = strip
 
 ####### Output directory
 
-OBJECTS_DIR   = release/
+OBJECTS_DIR   = debug/
 
 ####### Files
 
 SOURCES       = viewer.cpp \
-		qtimageviewer.cpp release/moc_qtimageviewer.cpp
-OBJECTS       = release/viewer.o \
-		release/qtimageviewer.o \
-		release/moc_qtimageviewer.o
+		qtimageviewer.cpp debug/moc_qtimageviewer.cpp
+OBJECTS       = debug/viewer.o \
+		debug/qtimageviewer.o \
+		debug/moc_qtimageviewer.o
 DIST          = /usr/lib/qt/mkspecs/features/spec_pre.prf \
 		/usr/lib/qt/mkspecs/common/unix.conf \
 		/usr/lib/qt/mkspecs/common/linux.conf \
@@ -170,12 +170,12 @@ viewer: myimagelibtarget $(OBJECTS)
 	$(LINK) $(LFLAGS) -o $(TARGET) $(OBJECTS) $(OBJCOMP) $(LIBS)
 
 qmake: FORCE
-	@$(QMAKE) -o Makefile.Release viewer.pro
+	@$(QMAKE) -o Makefile.Debug viewer.pro
 
 qmake_all: FORCE
 
 
-all: Makefile.Release viewer
+all: Makefile.Debug viewer
 
 dist: distdir FORCE
 	(cd `dirname $(DISTDIR)` && $(TAR) $(DISTNAME).tar $(DISTNAME) && $(COMPRESS) $(DISTNAME).tar) && $(MOVE) `dirname $(DISTDIR)`/$(DISTNAME).tar.gz . && $(DEL_FILE) -r $(DISTDIR)
@@ -196,7 +196,7 @@ clean: compiler_clean
 distclean: clean 
 	-$(DEL_FILE) $(TARGET) 
 	-$(DEL_FILE) .qmake.stash
-	-$(DEL_FILE) Makefile.Release
+	-$(DEL_FILE) Makefile.Debug
 
 
 ####### Sub-libraries
@@ -214,20 +214,20 @@ benchmark: first
 
 compiler_rcc_make_all:
 compiler_rcc_clean:
-compiler_moc_predefs_make_all: release/moc_predefs.h
+compiler_moc_predefs_make_all: debug/moc_predefs.h
 compiler_moc_predefs_clean:
-	-$(DEL_FILE) release/moc_predefs.h
-release/moc_predefs.h: /usr/lib/qt/mkspecs/features/data/dummy.cpp
-	g++ -pipe -O2 -std=gnu++11 -dM -E -o release/moc_predefs.h /usr/lib/qt/mkspecs/features/data/dummy.cpp
+	-$(DEL_FILE) debug/moc_predefs.h
+debug/moc_predefs.h: /usr/lib/qt/mkspecs/features/data/dummy.cpp
+	g++ -pipe -g -std=gnu++11 -dM -E -o debug/moc_predefs.h /usr/lib/qt/mkspecs/features/data/dummy.cpp
 
-compiler_moc_header_make_all: release/moc_qtimageviewer.cpp
+compiler_moc_header_make_all: debug/moc_qtimageviewer.cpp
 compiler_moc_header_clean:
-	-$(DEL_FILE) release/moc_qtimageviewer.cpp
-release/moc_qtimageviewer.cpp: qtimageviewer.hpp \
+	-$(DEL_FILE) debug/moc_qtimageviewer.cpp
+debug/moc_qtimageviewer.cpp: qtimageviewer.hpp \
 		../imagelib/image.hpp \
-		release/moc_predefs.h \
+		debug/moc_predefs.h \
 		/usr/bin/moc
-	/usr/bin/moc $(DEFINES) --include /home/zypreaxa/Projects/ImageProcessing/viewerqt5/release/moc_predefs.h -I/usr/lib/qt/mkspecs/linux-g++ -I/home/zypreaxa/Projects/ImageProcessing/viewerqt5 -I/home/zypreaxa/Projects/ImageProcessing/viewerqt5 -I/home/zypreaxa/Projects/ImageProcessing -I/home/zypreaxa/Projects/ImageProcessing/imagelib -I/usr/include/qt -I/usr/include/qt/QtCharts -I/usr/include/qt/QtWidgets -I/usr/include/qt/QtGui -I/usr/include/qt/QtCore -I/usr/include/c++/13 -I/usr/include/x86_64-linux-gnu/c++/13 -I/usr/include/c++/13/backward -I/usr/lib/gcc/x86_64-linux-gnu/13/include -I/usr/local/include -I/usr/include/x86_64-linux-gnu -I/usr/include qtimageviewer.hpp -o release/moc_qtimageviewer.cpp
+	/usr/bin/moc $(DEFINES) --include /home/zypreaxa/Projects/ImageProcessing/viewer/debug/moc_predefs.h -I/usr/lib/qt/mkspecs/linux-g++ -I/home/zypreaxa/Projects/ImageProcessing/viewer -I/home/zypreaxa/Projects/ImageProcessing/viewer -I/home/zypreaxa/Projects/ImageProcessing -I/home/zypreaxa/Projects/ImageProcessing/imagelib -I/usr/include/qt -I/usr/include/qt/QtCharts -I/usr/include/qt/QtWidgets -I/usr/include/qt/QtGui -I/usr/include/qt/QtCore -I/usr/include/c++/16 -I/usr/include/c++/16/x86_64-pc-linux-gnu -I/usr/include/c++/16/backward -I/usr/lib/gcc/x86_64-pc-linux-gnu/16/include -I/usr/local/include -I/usr/include qtimageviewer.hpp -o debug/moc_qtimageviewer.cpp
 
 compiler_moc_objc_header_make_all:
 compiler_moc_objc_header_clean:
@@ -245,21 +245,20 @@ compiler_clean: compiler_moc_predefs_clean compiler_moc_header_clean
 
 ####### Compile
 
-release/viewer.o: viewer.cpp qtimageviewer.hpp \
+debug/viewer.o: viewer.cpp qtimageviewer.hpp \
 		../imagelib/image.hpp \
 		../imagelib/tiffloader.hpp \
 		../imagelib/imageloader.hpp
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o release/viewer.o viewer.cpp
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o debug/viewer.o viewer.cpp
 
-release/qtimageviewer.o: qtimageviewer.cpp qtimageviewer.hpp \
+debug/qtimageviewer.o: qtimageviewer.cpp qtimageviewer.hpp \
 		../imagelib/image.hpp \
 		../imagelib/tiffloader.hpp \
-		../imagelib/imageloader.hpp \
-		../imagelib/imageprocessor.hpp
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o release/qtimageviewer.o qtimageviewer.cpp
+		../imagelib/imageloader.hpp
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o debug/qtimageviewer.o qtimageviewer.cpp
 
-release/moc_qtimageviewer.o: release/moc_qtimageviewer.cpp 
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o release/moc_qtimageviewer.o release/moc_qtimageviewer.cpp
+debug/moc_qtimageviewer.o: debug/moc_qtimageviewer.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o debug/moc_qtimageviewer.o debug/moc_qtimageviewer.cpp
 
 ####### Install
 
