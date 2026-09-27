@@ -13,7 +13,7 @@ format:
         
         toc: true
         number-sections: true
-        number-depth: 3
+        number-depth: 5
 
         fontsize: 11pt
         linestretch: 1.08
@@ -36,3 +36,44 @@ format:
         sansfont: "Libertinus Sans"
         monofont: "JetBrains Mono"
 ---
+# Assignment Description
+# Code Limitations
+## C++
+# Assignment Details
+## Image Loading
+### Image Investigations
+### Image loading using ```libtiff```
+#### Loading *tiled* and *striped* formats
+##### Anomalies encountered
+##### Anomaly description and reasoning
+#### Loading and visualizing sub-images of the ```.svs``` file
+#### Loading subregions of images
+
+### Image combination
+
+## Intensity Transormations
+### Power law for intensities (disregarding constant c)
+### Piece-wise linear intensity transformations
+### Histogram calculation for grayscale images
+### Histogram equalization
+### Lookup table intensity transformations
+
+## Spatial Filtering and Multistep Image Processing
+### Image classes for pixel intensities
+#### Methods of conversion
+### Image blurring by spatial filtering
+### Numerical approximations of derivative operators
+### Image sharpening using an intermediate Laplacian calculation
+#### Benefits
+#### Drawbacks
+### Multistep image processing
+
+## Image Transformations
+### Calculation of index-to-local and local-to-world transformations
+### Composite afiine transformations
+### Nearest Neighbor and Bi-linear Interpolation for vizualization of transformed images
+### Visualization of affine transformations
+#### Nearest Neighbor type
+#### Bi-linear type
+### QA of AI classification of kidney histology images
+
