@@ -24,7 +24,7 @@ format:
             - left=28mm
             - right=28mm
 
-        colorlinks: true
+        colorlinks: false
 
         fig-cap-location: bottom
         tbl-cap-location: top
@@ -37,17 +37,30 @@ format:
         monofont: "JetBrains Mono"
 ---
 
-# Assignment Description
+# Assignment Overview
+Digital image processing is the use of computer algorithms to manipulate, analyze, and process digital images represented as a grid of pixels.
+
+The aim of this project is to get a grasp on the core principles of how digital image processing works in practice, how regular filters, for example, negation, are constructed through code, and gain practical experience in reproducing already existing methods of image manipulation.
 
 # Code Limitations
+This project is built upon a premade base, a collection of files that is usually called a "code skeleton", which was the scaffolding which allowed us to focus on image analysis and manipulation without the need to also create the interface ourselves.
+
+Since I study programming-adjacent modules, I used C++ as my coding language of choice for this project.
 
 ## C++
+C++ is a high-performance, general-purpose programming language developed by Bjarne Stroustrup at AT&T Bell Labs in 1979 as an extension of the C programming language. Often described as a "middle-level" language, it bridges the gap by providing the raw speed and direct hardware control of low-level languages alongside the abstraction and structural advantages of high-level languages. Code snippets will be provided as examples over the course of this document.
 
 # Assignment Details
+This assignment is split into three parts. This is the first of the three reports that will be covering this project.
+
+Everything is separated into different parts, which are all separated in this document, shown by different number sectioning.
 
 ## Image Loading
+To get a better practical understanding of different language formats, their memory layout and how to combine and manipulate this information, tasks 3.1.1 - 3.1.3 were completed.
 
 ### Image Investigations
+![Metadata of ```Kidney1.tif``` file](ref/tiffinfokidney1.png){fig-alt="A screenshot of tiffinfo Kidney1.tif command output"}
+
 
 ### Image loading using `libtiff`
 
