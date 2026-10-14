@@ -189,7 +189,7 @@ unsigned char* TiffLoader::loadTiles(){
 			unsigned char* destrowptr = data + ((destY + i) * _width * bytesperpixel);
 			destrowptr += destX * bytesperpixel;
 
-			// this clips right edge if the tile overflows width (idk)
+			// this clips right edge if the tile overflows width (idk tho T_T)
 			uint32 copyWidth = std::min<uint32>(tilewidth, _width - destX);
 			
 			uint32 bytesToCopy = copyWidth * bytesperpixel;

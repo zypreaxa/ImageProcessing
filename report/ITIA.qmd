@@ -18,6 +18,8 @@ format:
         fontsize: 11pt
         linestretch: 1.08
 
+        fig-pos: H
+
         geometry:
             - top=25mm
             - bottom=25mm
@@ -59,26 +61,203 @@ Everything is separated into different parts, which are all separated in this do
 To get a better practical understanding of different language formats, their memory layout and how to combine and manipulate this information, tasks 3.1.1 - 3.1.3 were completed.
 
 ### Image Investigations
-![Metadata of ```Kidney1.tif``` file](ref/tiffinfokidney1.png){fig-alt="A screenshot of tiffinfo Kidney1.tif command output"}
+Tiffinfo displays information about files created according to the Tag Image File Format, Revision 6.0. By default, the contents of each TIFF directory in each file is displayed, with the value of each tag shown symbolically (where sensible). In short - it shows metadata of a `.tif` file, which can be seen in (@fig-tiffokidney1).
 
+![Metadata of `Kidney1.tif` file](ref/tiffinfokidney1.png){#fig-tiffokidney1}
+
+The syntax for image investigation can be seen in (@lst-tiffinfo). However, the options operator can be omitted if only general data is needed.
+
+``` {#lst-tiffinfo .bash lst-cap="tiffinfo syntax"}
+tiffinfo [option] info.tif
+```
+
+One interesting thing about this command, at least for me, was that `.svs` files can also be investigated.
+
+However, since these files are most commonly digital pathology slides, which have multiple layers, the output also shows data of multiple images. An snippet of one layer's metadata is shown in (@fig-tiffinfosvs).
+
+![Part of the tiffinfo command output of an `.svs` file](ref/tiffinffosvs.png){#fig-tiffinfosvs}
+
+I was not aware that pathology slides can be so massive, but a simple search had shown that they can commonly be up to 5GB, and if fully opened, it can take up towards 100GB of RAM. It is one of those interesting facts that made me a lot more curious about this subject as a whole.
 
 ### Image loading using `libtiff`
+To load the provided image handouts, the previously mentioned code skeleton was used. The code skeleton was able to run nearly without any modifications, only a couple little additions were needed to make it run on my device. The project was also tested on a Windows device, so there should not be any problems between platforms whatsoever.
+
+#### Guide to starting and navigating the program
+If VS Code is used, the program can be started through the terminal.
+
+![An example of what a terminal might look like in the IDE](ref/terminal.png){#fig-terminal}
+
+Once the project is opened in the IDE, a console window should be opened at the bottom section of the window (@fig-terminal). If it is not present, **Ctrl+Shift+`** will open a new terminal session. 
+
+Simply navigating to the ```viewerqt5``` folder and running the ```viewer``` file (@lst-launch) from the project base directory will launch the viewer that will be used for further image investigation. 
+
+```{#lst-launch .bash lst-cap="Command for running the viewer"}
+cd viewerqt5 && ./viewer
+```
+
+After executing the ```viewer``` file, you should be presented with the main QT viewer window.
+
+All functions and transformations can be accessed through the toolbar (see @fig-toolbar) in the top portion of the window.
+
+![Viewer program toolbar](ref/toolbar.png){#fig-toolbar}
+
+There is a dedicated button for each transformation and function. The specific location of it will be described under the corresponding part of this report.
 
 #### Loading *tiled* and *striped* formats
+The first step is only to open the images without needing to modify them. However, since ```.tif``` format images are separated into tiled and striped formats, you cannot simply render the image pixel-by-pixel.
+
+Withing the code itself, the class of TiffLoader needed to have defined methods that could fetch the metadata of the full image first to understand how to parse it. 
+
+There are 4 "getter" methods defined (see @lst-getters), which are used to get the dimensions of the full image, get the number of channels that it has associated with it (one channel would mean greyscale. Three generally means RGB), and Bits Per Channel (BPC), which in simple terms defines how deep each color channel is. The more bits/channel, the broader the range of shades that particular color can be defined in.
+
+```{#lst-getters .cpp lst-cap="Getter functions of TiffLoader class"}
+unsigned long getWidth() const {return _width;}
+unsigned long getLength() const {return _length;}
+unsigned long getChannels() const {return _channels;}
+unsigned long getBPC() const {return _bpc;}
+```
+
+Striped images are made up of separated *strips*, which need to be read one-by-one in order, and combined into one image. It is generally quite a simple process: iterating over each stripe, pixel by pixel, and adding them to one matrix of pixels in a row creates the full image (see @lst-loadstrips).
+
+```{#lst-loadstrips .cpp lst-cap="Code of the striped image loader function"}
+unsigned char* TiffLoader::loadStrips(){
+	for(tstrip_t i=0; i<nStrips; i++){
+		//actual code goes here
+		tsize_t bytes = TIFFReadEncodedStrip(_tiff, i, buffer, -1);
+};
+```
+As for tiled images - the TIFF stores the image itself as a grid of smaller images, called *tiles*. This function reads each tile, checks where that tile belongs in the final image, and copies it's rows into one large continuous buffer, which is what the final image is constructed from. A smaller snippet of this function can  be seen below. (See @lst-loadtiled)
+
+```{#lst-loadtiled .cpp lst-cap="Code of the tiled image loader function"}
+unsigned char* TiffLoader::loadTiles(){
+		
+		for(ttile_t i=0; i < tilelength; i++) {
+
+			if(destY + i >= _length)
+				break;
+
+			// pointer to row INSIDE the tile
+			unsigned char* tilerowptr = buffer + (i * tilewidth * bytesperpixel);
+
+			// pointer to the row in the final image
+			unsigned char* destrowptr = data + ((destY + i) * _width * bytesperpixel);
+			destrowptr += destX * bytesperpixel;
+
+	}
+	delete[] buffer;
+	return data;
+};
+```
 
 ##### Anomalies encountered
+There was generally little unexpected behavior with this part of the assignments. All images were rendered, and they all looked seemingly faultless, if not a little strange-looking in some cases. Since most of the handout files are medical pathology images, the strangeness was anticipated.
 
-##### Anomaly description and reasoning
+One thing I did not expect was for the ```TMA2-V2.tif``` file to actually have two layers instead of one like the rest. However, I do not consider this unusual or anomalous, only unexpected.
 
 #### Loading and visualizing sub-images of the `.svs` file
+The implementation of opening `.svs` format files was not built as a separate function on it's own, but directly into the `openFile()` function. 
+
+The function checks if the file contains more than one directory, and if the answer is yes, it allows you to pick which directory you wish to load. They are all listed, so no guess-work is required from the user.
+
+Looking back, it may have been a better call to split it into it's own `.svsLoader()` function, however, it does not seem to cause any notable issues.
+
+```{#lst-svs .cpp lst-cap="Snippet of the openFile() function containing selection of directories."}
+_dirCount = TIFFNumberOfDirectories(_tiff);
+			std::cout<<"Tiff DIR count: "<< _dirCount << std::endl;
+			if(_dirCount > 1 | _dirCount < 0) {
+				int input;
+				while(true) {
+					std::cout << "This file contains multiple directories (0-"
+					<< (_dirCount - 1) << "). Pick a directory: " << std::endl;
+					std::cin >> input;
+
+					// validation
+					if(!std::cin) {
+						std::cin.clear();
+						//std::cin.ignore(10000, "\n");
+						std::cout << "Error. Please select a valid directory index.\n";
+						continue;
+					}
+					if(input < 0 || input >= _dirCount) {
+						std::cout << "Directory does not exist. Please try again.\n";
+						continue;
+					}
+					break; // valid choice hurray
+				}
+```
 
 #### Loading subregions of images
 
-### Image combination
 
-## Intensity Transormations
+### Image combination
+As we have received three files, each containing only a single channel's worth of of information, we needed to combine them into one singular RGB image.
+
+The code for this is quite simple. The dimensions of the *red* image are taken, and used as the final dimensions for the RGB image.
+
+Using the dimensions for the *red* image in this case is arbitrary, since all three are of the same dimensions. In the following versions, this part of the code will be changed to abort the combination process if the images are of different dimensions.
+
+Since the full function is quite short, the full function can be seen in the list below. (See @lst-rgb)
+
+```{#lst-rgb .cpp lst-cap="Function for combining single channel images into an RGB output."}
+Image<>* ImageProcessor::combineRGB(
+    Image<>* red,
+    Image<>* green,
+    Image<>* blue
+)
+{
+    if (!red | !green | !blue) {
+        return nullptr;
+    } // checking for errors
+
+    unsigned long width = red->getWidth();
+    unsigned long height = red->getHeight();
+    unsigned long bpc = red->getBpc(); // this assumes that all 3 images are the same size
+    unsigned long channels = 3;
+
+    unsigned char* data = new unsigned char [width * height * channels * (bpc/8)];
+
+    for (unsigned long y = 0; y < height; y++) {
+        for (unsigned long x = 0; x < width; x++) {
+            unsigned long idx = (y * width + x) * channels; // this turns the pixel coordinates from a 2D array into a 1D index
+            data[idx] = red->getImageData()[y * width + x]; // R
+            data[idx+1] = green->getImageData()[y * width + x]; // G
+            data[idx+2] = blue->getImageData()[y * width + x]; // B
+        }
+    }
+
+    Image<>* out = new Image<>(width, height, channels, bpc, data);
+    return out;
+};
+```
+I would like to note that after selecting the three images through the pop-up prompt, a fourth one will be displayed. This is for choosing a destination for saving the file. You may freely cancel the save process, it will not return errors. It will simply allow you to see the combined result in the viewer.
+
+If you choose to save the image, it will be saved as a separate file on your device.
+
+## Intensity Transformations
 
 ### Power law for intensities (disregarding constant c)
+Since two images can be displayed at once in this version of this project, the image seen on the left will always be the original image opened besides the output of the transformation on the right.
+
+The implementation of the power law of intensities (disregarding the constant c) will no longer be included in the report, as the code from this point on will become repetetive.
+
+As the formula itself for power negation is simply raising the pixel's value by the power of γ, which is a chosen number, I expect the images to become much higher in contrast between the two different bounds of the pixel intensity. For example, raising a pixel with the value of 1 by a γ of 3 would not change it's value at all. However, the higher the value, the more extreme the change would be. I would expect the higher values to become a lot more pronounced, while the darker values stay dark. Completely black regions would remain unchanged.
+
+The results with different gamma values for the `breast_digital_xray.tif` image are listed below. (See @fig-gamma1 - @fig-gamma3)
+
+![Output with the γ parameter set at 1.](ref/gamma1.png){#fig-gamma1}
+
+![Output with the γ parameter set at 2.](ref/gamma2.png){#fig-gamma2}
+
+![Output with the γ parameter set at 3.](ref/gamma3.png){#fig-gamma3}
+
+In reality, the true answer was a little more complicated that I previously thought.
+
+As the γ value can be set at a number that is *below* 1, for example, 0.1, raising any number to that power will have a completely different effect. In this case, something like a γ value of 0.5 would noticeably brighten the image without making it lose all contrast.
+
+One issue I encountered while implementing this function was the γ value being defaulted to 0 when the actual input was a float number below 1, which would turn the entire image white. That was remedied by using **`std::pow()`** instead of the **`^`** operator, which I learned forces every equation into an XOR operation. The successful application of this fix can be seen in the figure below. (See @fig-gamma0.5)
+
+![Output with the γ parameter set at 0.5.](ref/gamma0.5.png){#fig-gamma0.5}
+
 
 ### Piece-wise linear intensity transformations
 

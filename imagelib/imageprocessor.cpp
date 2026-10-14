@@ -13,7 +13,7 @@ Image<>* ImageProcessor::combineRGB(
         return nullptr;
     } // checking for errors
 
-    unsigned char width = red->getWidth();
+    unsigned long width = red->getWidth();
     unsigned long height = red->getHeight();
     unsigned long bpc = red->getBpc(); // this assumes that all 3 images are the same size
     unsigned long channels = 3;
@@ -135,7 +135,8 @@ Image<>* ImageProcessor::powerlawtr(Image<>* img){
         for(int y=0; y<height; y++){
             for(int x=0; x<width; x++){
                 Pixel<> p = img->getPixel(x, y);
-                p.r = 255.0 * std::pow(p.r / 255.0, gamma);
+                float normalized = p.r / 255.0f;
+                p.r = 255.0f * std::pow(normalized, gamma);
                 img->setPixel(x, y, p);
             }
         }
@@ -164,7 +165,7 @@ Image<>* ImageProcessor::powerlawlut(Image<>* img){
     unsigned long height = img->getHeight();
     unsigned long channels = img->getChannels(); // supposed to be mainly greyscale, but might as well
     unsigned long bpc = img->getBpc();
-    int gamma;
+    double gamma;
     std::cout << "Select gamma value: ";
     std::cin >> gamma;
 
@@ -183,13 +184,13 @@ Image<>* ImageProcessor::powerlawlut(Image<>* img){
         }
         return img;
     }
-    else if(channels==3){  // completely incorrect lol
+    else if(channels==3){  // completely incorrect lol don't use this
         for(int y=0; y<height; y++){
             for(int x=0; x<width; x++){
                 Pixel<> p = img->getPixel(x, y);
-                p.r = p.r ^ gamma;
-                p.g = p.g ^ gamma;
-                p.b = p.b ^ gamma;
+                p.r = std::pow(p.r, gamma);
+                p.g = std::pow(p.g, gamma);
+                p.b = std::pow(p.b, gamma);
                 img->setPixel(x, y, p);
             }
         }
