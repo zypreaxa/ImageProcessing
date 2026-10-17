@@ -43,6 +43,8 @@ public slots:
 	void lowpass();
 	void median();
 	void laplacian();
+	void unsharp();
+	void multi();
 private:
 	enum ImageView{
 		NONE = 0,
@@ -98,6 +100,8 @@ private:
 	QAction *_spatialLowpass{nullptr};
 	QAction *_spatialMedian{nullptr};
 	QAction *_spatialLaplacian{nullptr};
+	QAction *_spatialUnsharp{nullptr};
+	QAction *_spatialMulti{nullptr};
 
 	QMenu *_toolsMenu{nullptr};
 

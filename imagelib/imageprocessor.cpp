@@ -594,3 +594,53 @@ Image<>* ImageProcessor::laplacian(Image<>* img){
     delete outfloat;
     return result;
 };
+
+Image<>* ImageProcessor::unsharp(Image<>* img){
+    size_t width = img->getWidth();
+    size_t height = img->getHeight();
+    size_t channels = img->getChannels();
+
+    if(channels!=1){
+        std::cerr << "Selected image is not greyscale.\n";
+        return nullptr;
+    }
+    Image<float>* imgf = ImageProcessor::toFloat(img);
+    float* dataf = imgf->getImageData();
+    float* outbuff = new float[width * height];
+    Image<float>* outfloat = new Image<float>(width, height, 1, 32, outbuff);
+
+    for(size_t y=1; y<height-1; y++){
+        for(size_t x=1; x<width-1; x++){
+            float gausval = (2.0f*imgf->getPixelValue(x+1,y)+2.0f*imgf->getPixelValue(x-1,y)
+            +2.0f*imgf->getPixelValue(x,y+1)+2.0f*imgf->getPixelValue(x,y-1)
+            +4.0f*imgf->getPixelValue(x,y)+imgf->getPixelValue(x-1,y-1)+imgf->getPixelValue(x-1,y+1)
+            +imgf->getPixelValue(x+1,y-1)+imgf->getPixelValue(x+1,y+1))/16.0f;
+            
+            Pixel<float> out;
+            out.r = out.b = out.g = imgf->getPixelValue(x,y) + 2.0f * (imgf->getPixelValue(x, y) - gausval); 
+            outfloat->setPixel(x, y, out);
+        }
+    }
+    Image<uint8_t>* result = ImageProcessor::to8bit(outfloat);
+    delete imgf;
+    delete outfloat;
+    return result;
+};
+
+Image<>* ImageProcessor::multi(Image<>* img) {
+
+    if (!img) return nullptr;
+
+    // Step 1: Negation
+    if (!ImageProcessor::negationtr(img))
+        return nullptr;
+
+    // Step 2: Power-law transformation
+    if (!ImageProcessor::powerlawtr(img))
+        return nullptr;
+
+    // Step 3: Unsharp masking
+    Image<>* result = ImageProcessor::unsharp(img);
+
+    return result;
+}

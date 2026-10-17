@@ -142,6 +142,14 @@ void QtImageViewer::createActions(){
 	_spatialLaplacian->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_X));
 	connect(_spatialLaplacian, SIGNAL(triggered()), this, SLOT(laplacian()));
 
+	_spatialUnsharp = new QAction(tr("Unsharp transform..."), this);
+	_spatialUnsharp->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_U));
+	connect(_spatialUnsharp, SIGNAL(triggered()), this, SLOT(unsharp()));
+
+	_spatialMulti = new QAction(tr("Multi transform..."), this);
+	_spatialMulti->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_M));
+	connect(_spatialMulti, SIGNAL(triggered()), this, SLOT(multi()));
+
 	_fileMenu = menuBar()->addMenu(tr("&File"));
 	_fileMenu->addAction(_fileOpenAction);
 	_fileMenu->addAction(_fileClearAction);
@@ -165,6 +173,8 @@ void QtImageViewer::createActions(){
 	_spatialMenu->addAction(_spatialLowpass);
 	_spatialMenu->addAction(_spatialMedian);
 	_spatialMenu->addAction(_spatialLaplacian);
+	_spatialMenu->addAction(_spatialUnsharp);
+	_spatialMenu->addAction(_spatialMulti);
 
 	_toolsMenu = menuBar()->addMenu(tr("&Tools"));
 };
@@ -536,6 +546,32 @@ void QtImageViewer::laplacian(){
 	Image<>* img = trloader.loadImage();
 
 	Image<>* filtered = processor.laplacian(img);
+	showImageRight(filtered);
+	delete img;
+	delete filtered;
+};
+void QtImageViewer::unsharp(){
+	ImageProcessor processor;
+	QString filename = QFileDialog::getOpenFileName(this, "Select image for unsharp transform...");
+	if(filename.isEmpty()) return;
+
+	TiffLoader trloader = (filename.toStdString());
+	Image<>* img = trloader.loadImage();
+
+	Image<>* filtered = processor.unsharp(img);
+	showImageRight(filtered);
+	delete img;
+	delete filtered;
+};
+void QtImageViewer::multi(){
+	ImageProcessor processor;
+	QString filename = QFileDialog::getOpenFileName(this, "Select image for multi transform...");
+	if(filename.isEmpty()) return;
+
+	TiffLoader trloader = (filename.toStdString());
+	Image<>* img = trloader.loadImage();
+
+	Image<>* filtered = processor.multi(img);
 	showImageRight(filtered);
 	delete img;
 	delete filtered;

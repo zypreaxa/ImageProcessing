@@ -22,8 +22,8 @@ QT_BEGIN_MOC_NAMESPACE
 QT_WARNING_PUSH
 QT_WARNING_DISABLE_DEPRECATED
 struct qt_meta_stringdata_QtImageViewer_t {
-    QByteArrayData data[23];
-    char stringdata0[238];
+    QByteArrayData data[25];
+    char stringdata0[252];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -54,7 +54,9 @@ QT_MOC_LITERAL(18, 185, 15), // "thresholdingLUT"
 QT_MOC_LITERAL(19, 201, 11), // "histogrameq"
 QT_MOC_LITERAL(20, 213, 7), // "lowpass"
 QT_MOC_LITERAL(21, 221, 6), // "median"
-QT_MOC_LITERAL(22, 228, 9) // "laplacian"
+QT_MOC_LITERAL(22, 228, 9), // "laplacian"
+QT_MOC_LITERAL(23, 238, 7), // "unsharp"
+QT_MOC_LITERAL(24, 246, 5) // "multi"
 
     },
     "QtImageViewer\0showImageLeft\0\0"
@@ -63,7 +65,7 @@ QT_MOC_LITERAL(22, 228, 9) // "laplacian"
     "togreyscale\0negate\0negateLUT\0powerlaw\0"
     "powerlawLUT\0linear\0linearLUT\0thresholding\0"
     "thresholdingLUT\0histogrameq\0lowpass\0"
-    "median\0laplacian"
+    "median\0laplacian\0unsharp\0multi"
 };
 #undef QT_MOC_LITERAL
 
@@ -73,7 +75,7 @@ static const uint qt_meta_data_QtImageViewer[] = {
        8,       // revision
        0,       // classname
        0,    0, // classinfo
-      19,   14, // methods
+      21,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
@@ -81,29 +83,33 @@ static const uint qt_meta_data_QtImageViewer[] = {
        0,       // signalCount
 
  // slots: name, argc, parameters, tag, flags
-       1,    1,  109,    2, 0x0a /* Public */,
-       5,    1,  112,    2, 0x0a /* Public */,
-       6,    0,  115,    2, 0x0a /* Public */,
-       7,    0,  116,    2, 0x0a /* Public */,
-       8,    0,  117,    2, 0x0a /* Public */,
-       9,    0,  118,    2, 0x0a /* Public */,
-      10,    0,  119,    2, 0x0a /* Public */,
-      11,    0,  120,    2, 0x0a /* Public */,
-      12,    0,  121,    2, 0x0a /* Public */,
-      13,    0,  122,    2, 0x0a /* Public */,
-      14,    0,  123,    2, 0x0a /* Public */,
-      15,    0,  124,    2, 0x0a /* Public */,
-      16,    0,  125,    2, 0x0a /* Public */,
-      17,    0,  126,    2, 0x0a /* Public */,
-      18,    0,  127,    2, 0x0a /* Public */,
-      19,    0,  128,    2, 0x0a /* Public */,
-      20,    0,  129,    2, 0x0a /* Public */,
-      21,    0,  130,    2, 0x0a /* Public */,
-      22,    0,  131,    2, 0x0a /* Public */,
+       1,    1,  119,    2, 0x0a /* Public */,
+       5,    1,  122,    2, 0x0a /* Public */,
+       6,    0,  125,    2, 0x0a /* Public */,
+       7,    0,  126,    2, 0x0a /* Public */,
+       8,    0,  127,    2, 0x0a /* Public */,
+       9,    0,  128,    2, 0x0a /* Public */,
+      10,    0,  129,    2, 0x0a /* Public */,
+      11,    0,  130,    2, 0x0a /* Public */,
+      12,    0,  131,    2, 0x0a /* Public */,
+      13,    0,  132,    2, 0x0a /* Public */,
+      14,    0,  133,    2, 0x0a /* Public */,
+      15,    0,  134,    2, 0x0a /* Public */,
+      16,    0,  135,    2, 0x0a /* Public */,
+      17,    0,  136,    2, 0x0a /* Public */,
+      18,    0,  137,    2, 0x0a /* Public */,
+      19,    0,  138,    2, 0x0a /* Public */,
+      20,    0,  139,    2, 0x0a /* Public */,
+      21,    0,  140,    2, 0x0a /* Public */,
+      22,    0,  141,    2, 0x0a /* Public */,
+      23,    0,  142,    2, 0x0a /* Public */,
+      24,    0,  143,    2, 0x0a /* Public */,
 
  // slots: parameters
     QMetaType::Void, 0x80000000 | 3,    4,
     QMetaType::Void, 0x80000000 | 3,    4,
+    QMetaType::Void,
+    QMetaType::Void,
     QMetaType::Void,
     QMetaType::Void,
     QMetaType::Void,
@@ -150,6 +156,8 @@ void QtImageViewer::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _i
         case 16: _t->lowpass(); break;
         case 17: _t->median(); break;
         case 18: _t->laplacian(); break;
+        case 19: _t->unsharp(); break;
+        case 20: _t->multi(); break;
         default: ;
         }
     }
@@ -184,13 +192,13 @@ int QtImageViewer::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 19)
+        if (_id < 21)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 19;
+        _id -= 21;
     } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
-        if (_id < 19)
+        if (_id < 21)
             *reinterpret_cast<int*>(_a[0]) = -1;
-        _id -= 19;
+        _id -= 21;
     }
     return _id;
 }

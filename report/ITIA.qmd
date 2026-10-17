@@ -385,12 +385,91 @@ This kernel compares the center pixel with it's direct neighbors. It responds to
 Interestingly, another common convention uses the negative of this kernel, with 4 in the center and -1 around it. This specific method was used as the intermediate Laplacian calculation in the next segment of the report.
 
 ### Image sharpening using an intermediate Laplacian calculation
+An intermediate Laplacian calculation was implemented for this excercise. Mathematically, the code can be expressed with an equation:
+
+$\nabla^2I(x,y)=\begin{bmatrix}I(x+1,y)+I(x-1,y)\\+I(x,y+1)+I(x,y-1)\end{bmatrix}-4I(x,y)$
+
+More conventionally, it can be written as a scalar equation:
+
+$\nabla^2I(x,y)=I(x+1,y)+I(x-1,y)+I(x,y+1)+I(x,y-1)-4I(x,y)$
+
+In these formula, $I(x,y)$ is referring to the intensity of the current pixel.
+
+This is an approximate of the continuous 2D Laplacian:
+
+$\nabla^2I=\frac{\partial^2I}{\partial x^2}+\frac{\partial^2I}{\partial y^2}$
+
+The resulting kernel corresponds to the previously noted common 3x3 approximation, which can be expressed through a kernel:
+
+$K_{lap}=\begin{bmatrix}0&1&0\\1&-4&1\\0&1&0\end{bmatrix}$
+
+The line `out.r = out.b = out.g = imgf->getPixelValue(x, y) - c * lapval;` performs Laplacian sharpening, using the original image and subtracting a scaled Laplacian from the original values:
+
+$I_{Laplacian}(x,y)=I(x,y)-c\nabla^2I(x,y)$
+
+where *c* controls the intensity of the sharpening effect.
+
+As for the effects:
+- **Flat regions** - The neighbors are very similar or very slightly different in value, so the Laplacian is very low/close to zero. These regions remain nearly unchanged.
+- **Edges and fine lines** - Since the pixel values can differ dramatically in these regions, the Laplacian has a larger magnitude. The correction enhances these transition areas.
+
+Fair note - larger *c* value produces stronger sharpening in most cases. However, setting these values to extreme values can create visual artifacts like halos, or amplify noise to an unneeded degree.
+
+### Image sharpening using unsharp mask
+The unsharp mask implementation is quite similar to the Laplacian calculation; however, instead of applying a kernel directly on the neighborhood, a gaussian blur is introduced first.
+
+The used formula can be expressed as a kernel just like before:
+
+$K_{unsharp}=\frac{1}{16}\begin{bmatrix}1&2&1\\2&4&2\\1&2&1\end{bmatrix}$
+
+This kernel is applied to the pixel neighborhood, and the pixel that is currently being processed using the unsharp formula:
+
+$g(x,y)=f(x,y)+k(f(x,y)-b(x,y))$,
+
+where $b(x,y)$ is referring to the gaussian value extracted by applying the kernel to the neighborhood as previously described.
+
+The final result of the sharpening can be seen below. (See @fig-unsharp)
+
+![Image of the moon sharpened by unsharp mask.](ref/unsharp.png){#fig-unsharp}
+
+It is notable that in the application of the unsharp formula on the select pixel (see @lst-unsharp), the value `2.0f` is the "amplification" of shapening. The higher this value is set, the more intense the sharpening effect.
+
+```{#lst-unsharp .cpp lst-cap="Calculation of final unsharp value."}
+out.r = out.b = out.g = imgf->getPixelValue(x,y) + 2.0f * (imgf->getPixelValue(x, y) - gausval); 
+            outfloat->setPixel(x, y, out);
+```
 
 #### Benefits
+Laplacian:
+- It was extremely easy to implement, as simply running a kernel through the whole image was enough. It may only apply with intermediate calculations; however, that was exactly what was needed in this case.
+- It requires a reasonably low amount of operations per pixel, which makes it quite efficient.
+
+Unsharp:
+- The sharpening intensity can be controlled independently from the Gaussian blur, which can produce interesting results.
+- When parameters are chosen with caution, the results can be noticeably better than Laplacian for sharpening images. Personally, I noticed way less unneeded noise enhancement.
+- It was quite easy to understand, even if it did look a bit daunting at first.
 
 #### Drawbacks
+Laplacian:
+- I noticed a very high sensitivity to noise. It was almost jarring to see details that were not previously visible pop out of the dark.
+- The sharpening combined with sensitivity to noise commonly produced unnatural looking edges, which made the image look a lot more imperfect and poor quality than it actually was.
+- Since it only has one parameter which can be easily changed without changing the whole kernel, it can feel a bit rigid to modify.
+
+Unsharp:
+- Since it basically includes two separate operations at once, it is a lot more computationally intensive to process.
+- This method seems to create visible outlines that may look slightly out of place on high-contrast edges of objects.
+- I noticed that poorly chosen parameters may make the image look completely fake; however, I would attribute this fault to the user, not the algorithm itself.
 
 ### Multistep image processing
+For this task, a separate function was implemented. In a later version, I would like to implement a multi-step processing tool which would allow you to apply multiple transformations back-to-back in the viewer itself, but, unfortunately, I did not have enough time to do that.
+
+The pipeline for this task is as follows: `Negation > Power-Law > Unsharp`. Since everything is modular, I simply plugged in the already defined functions into one chain in my new `multi()` function specifically made for this task. The process is equivalent to applying a new transformation to an already transformed image. In other words, the transformation are done one by one, each transforming the output of the previous funtion. 
+
+The transformation function can be found in the *Spatial filtering* menu in the toolbar.
+
+For the example, I used a γ value of 5. (See @fig-multi)
+
+![Multi-step processing output.](ref/multi.png){#fig-multi}
 
 ## Image Transformations
 
