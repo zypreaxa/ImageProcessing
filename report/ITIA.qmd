@@ -258,10 +258,19 @@ One issue I encountered while implementing this function was the γ value being 
 
 ![Output with the γ parameter set at 0.5.](ref/gamma0.5.png){#fig-gamma0.5}
 
-
 ### Piece-wise linear intensity transformations
+For Piece-wise linear intensity transformations, two separate functions were implemented: one for histogram stretching, and one for thresholding. I would like to note that the histogram stretching function is done through the function named `Piece-wise linear`.
+
+The `Piece-wise linear` function equalizes pixel values in three specific ranges: the dark pixels become even darker, the pixels in the mid-range get altered with a slope of 1/3, which increases the contrast in this range, and the pixels in the high-end of the range are mapped to a compressed intensity range. And example transform output of the `kidney.tif` file was used. (See @fig-pw1)
+
+![Linear transform of `kidney.tif`.](ref/pwl.png){#fig-pw1}
+
+The `Thresholding` function behaves like a binary separator - pixels above a certain value are assigned a way higher value, while pixels below a certain value get bumped down to a very low value. The same kidney image was used as an input for comparison. (See @fig-thresholding)
+
+![Thresholding function output of `kidney.tif`.](ref/thresholding.png){#fig-thresholding}
 
 ### Histogram calculation for grayscale images
+As the histogram container was already implemented into the code skeleton, minimal changes were made to show accurate histograms for opened and transformed images. They are automatically displayed below every opened and transformed image. The visual output of what a histogram looks like can be seen in the next segment.
 
 ### Histogram equalization
 
@@ -272,10 +281,108 @@ One issue I encountered while implementing this function was the γ value being 
 ### Image classes for pixel intensities
 
 #### Methods of conversion
+For converting images between two separate types of image arrays, functions `toFloat()` and `to8bit` were implemented. 
+
+The `toFloat()` function first retrieves the sample size and the standart metadata, just like any other function in this project. Then, for each sample in the image, the pixel is converted to a a floating-point value between 0 and 1. (See @lst-tofloat)
+
+```{#lst-tofloat .cpp lst-cap="toFloat() function code."}
+Image<float>* ImageProcessor::toFloat(Image<uint8_t>* img8) {
+    size_t width = img8->getWidth();
+    size_t height = img8->getHeight();
+    size_t channels = img8->getChannels();
+    unsigned long bpc = img8->getBpc(); 
+
+    size_t nSamples = width * height * channels;
+
+    uint8_t* src = img8->getImageData();
+    float* dst = new float[nSamples];
+
+    for (size_t i = 0; i < nSamples; ++i) {
+        dst[i] = static_cast<float>(src[i]) / 255.0f;
+    }
+
+    unsigned long floatBpc = 32;
+    return new Image<float>(width, height, channels, floatBpc, dst);
+}
+```
+The range of the pixel gets clamped to [0, 1], and a new `Image<float>` is returned.
+
+The conversion to 8-bit is done by the `to8bit()` function.
+
+The process is very similar. The metadata is retrieved, and the value is multiplied by 255. The range of the value get's clamped to [0, 255], and the data is bundled together and passed as an output `Image<uint8_t>`. (See )
+
+```{#lst-to8bit .cpp lst-cap="to8bit() function code."}
+Image<uint8_t>* ImageProcessor::to8bit(Image<float>* imgf) {
+    size_t width    = imgf->getWidth();
+    size_t height   = imgf->getHeight();
+    size_t channels = imgf->getChannels();
+    size_t nSamples = width * height * channels;
+
+    float* src = imgf->getImageData();
+    uint8_t* dst = new uint8_t[nSamples];
+
+    for (size_t i = 0; i < nSamples; ++i) {
+        float v = clamp(src[i], 0.0f, 1.0f);
+        int rounded = static_cast<int>(std::round(v * 255.0f));
+        dst[i] = static_cast<uint8_t>(clamp(rounded, 0, 255));
+    }
+
+    unsigned long outBpc = 8;
+    return new Image<uint8_t>(width, height, channels, outBpc, dst);
+}
+```
+
+I would like to note that both of these functions take the other function's output type as the required input type. This way, the conversion does not require any extra in-between steps.
 
 ### Image blurring by spatial filtering
+For image blurring, a `lowpass()` function was created. This function takes the neighborhood of the pixel, which would be the eight pixels surrounding it, and changes the value of the center pixel to the average of it's neighbors. This algorithm smooths out the image, which results in a blurred output. An example of this function's output can be seen below. (See @fig-lowpass)
+
+![Lowpass function results.](ref/lowpass.png){#fig-lowpass}
+
+The `median()` function was also introduced, which takes the median of the neighborhood instead of of the average. The same input image was used for comparison. (See @fig-median)
+
+![Median function results.](ref/median.png){#fig-median}
 
 ### Numerical approximations of derivative operators
+The central difference formula can be implemented using a kernel:
+$K_x = \begin{bmatrix}0 & 0 & 0\\-1 & 0 & 1\\0 & 0 & 0\end{bmatrix}$ 
+
+If you apply this kernel to every pixel in the image, you will get an approximation of the horizontal derivative at every location.
+
+Similarly for the vertical derivative:
+$K_y = \begin{bmatrix}0 & -1 & 0\\0 & 0 & 0\\0 & 1 & 0\end{bmatrix}$ 
+
+The sign depends on the coordinate convention and how convolution is implemented. Some implementations may reverse the kernel, changing the sign but not the magnitude.
+
+#### Magnitude of gradient
+
+The gradient magnitude combines two partial derivatives:
+
+$\nabla I = \begin{bmatrix} \frac{\partial I}{\partial x}\\\frac{\partial I}{\partial y} \end{bmatrix}$
+
+It's magnitude is calculated as:
+
+$|\nabla I| = \sqrt{(\frac{\partial I}{\partial x})^2 + (\frac{\partial I}{\partial y})^2}$
+
+In simple terms, it measures how strongly the image intensity changes in any direction.
+
+Flat regions have small gradient magnitudes because the intensity between neighboring pixels barely changes. Edges can have large gradient magnitudes because their intensity can change very rapidly.
+
+It can be implemented by applying the horizontal and vertical derivative filters separately, then combining their outputs using the formula listed above.
+
+Note the the magnitude calculation is non-linear; the individual derivative operations are linear filters.
+
+#### Laplacian
+
+The Laplacian measures the sum of second derivatives: 
+
+$\nabla^2 I = \frac{\partial^2 I}{\partial x^2}+\frac{\partial^2 I}{\partial y^2}$
+
+A common 3x3 approximation is: $\begin{bmatrix}0&1&0\\1&-4&1\\0&1&0\end{bmatrix}$
+
+This kernel compares the center pixel with it's direct neighbors. It responds to changes in intensity, and is commonly used for edge detection and image sharpening.
+
+Interestingly, another common convention uses the negative of this kernel, with 4 in the center and -1 around it. This specific method was used as the intermediate Laplacian calculation in the next segment of the report.
 
 ### Image sharpening using an intermediate Laplacian calculation
 
