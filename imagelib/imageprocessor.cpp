@@ -102,6 +102,7 @@ Image<>* ImageProcessor::negationtr(Image<>* img){
 Image<>* ImageProcessor::negationlut(Image<>* img){
     size_t width = img->getWidth();
     size_t height = img->getHeight();
+    unsigned long channels = img->getChannels();
 
     std::cout << "Inverting greyscale image...\n";
 
@@ -110,7 +111,23 @@ Image<>* ImageProcessor::negationlut(Image<>* img){
         lut[k] = 255 - k;
     }
 
-    for(size_t y=0; y<height; ++y){
+    if(channels=3){ // if simple 3 channel RGB
+        std::cout << "Inverting RGB image...\n";
+        
+        for(size_t y=0; y<height; y++){
+            for(size_t x=0; x<width; x++){
+                Pixel<> p = img->getPixel(x, y);
+                p.r = lut[p.r];
+                p.g = lut[p.g];
+                p.b = lut[p.b];
+                
+                img->setPixel(x, y, p);
+            }
+        }
+        return img;
+    }
+
+    else for(size_t y=0; y<height; ++y){
         for(size_t x=0; x<width; ++x){
             Pixel<> p = img->getPixel(x, y);
             p.r = lut[p.r];

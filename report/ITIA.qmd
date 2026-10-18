@@ -124,6 +124,7 @@ unsigned char* TiffLoader::loadStrips(){
 	for(tstrip_t i=0; i<nStrips; i++){
 		//actual code goes here
 		tsize_t bytes = TIFFReadEncodedStrip(_tiff, i, buffer, -1);
+    };
 };
 ```
 As for tiled images - the TIFF stores the image itself as a grid of smaller images, called *tiles*. This function reads each tile, checks where that tile belongs in the final image, and copies it's rows into one large continuous buffer, which is what the final image is constructed from. A smaller snippet of this function can  be seen below. (See @lst-loadtiled)
@@ -234,6 +235,7 @@ I would like to note that after selecting the three images through the pop-up pr
 If you choose to save the image, it will be saved as a separate file on your device.
 
 ## Intensity Transformations
+In this section of the task, we familiarized ourselves with intensity histograms, image intensity transformations and how they can be inspected through the afformentioned histograms.
 
 ### Power law for intensities (disregarding constant c)
 Since two images can be displayed at once in this version of this project, the image seen on the left will always be the original image opened besides the output of the transformation on the right.
@@ -275,10 +277,29 @@ As the histogram container was already implemented into the code skeleton, minim
 ### Histogram equalization
 
 ### Lookup table intensity transformations
+In order to simplify the code, lookup table intensity transformations were implemented as alternative versions for already existing functions. They can be distinguised by the additional `LUT` tag after the function name in the toolbar of the viewer. (See @fig-lut)
+
+![Lookup table transformation selection.](ref/lut.png){#fig-lut}
+
+In essence, this only made the functions more efficient, as the values only needed to be *retrieved* from the lookup table instead of requiring a calculation for every pixel, even if the result would have been the same.
+
+The functionality of implemented algorithms did not change the outputs whatsoever; however, personally, it made the code more simple to understand.
 
 ## Spatial Filtering and Multistep Image Processing
 
 ### Image classes for pixel intensities
+As images are stored as `8bit` by default, the calculations of their values are limited. In order to apply more precise algorithms and process the pixel intensities properly, conversion of the `Image` object to and from `float` type was introduced. This way, the intensity of the pixel is not defined within the range $[0,255]$, but to any `float` value between $[0,1]$. This way, operations with float parameters are allowed; for example: setting a γ of 0.5, which would turn the whole image into a white canvas with regular `8bit` values, now behaves as expected.
+
+However, as `Image` objects are still stored in `8bit` format, the methods are called whenever they are needed, as the implementation is modular and does not require rewriting the fuction in each implementation.
+
+As I ran into issues where the values did not get properly clamped, I had to introduce a template into my ImageProcessor class which clamps the values to the proper range. (See )
+
+```{#lst-clamp .cpp lst-cap="Clamp template."}
+static const T& clamp(const T& v, const T& lo, const T& hi)
+    {
+        return (v < lo) ? lo : (hi < v) ? hi : v;
+    };
+```
 
 #### Methods of conversion
 For converting images between two separate types of image arrays, functions `toFloat()` and `to8bit` were implemented. 
@@ -355,7 +376,6 @@ $K_y = \begin{bmatrix}0 & -1 & 0\\0 & 0 & 0\\0 & 1 & 0\end{bmatrix}$
 The sign depends on the coordinate convention and how convolution is implemented. Some implementations may reverse the kernel, changing the sign but not the magnitude.
 
 #### Magnitude of gradient
-
 The gradient magnitude combines two partial derivatives:
 
 $\nabla I = \begin{bmatrix} \frac{\partial I}{\partial x}\\\frac{\partial I}{\partial y} \end{bmatrix}$
@@ -373,7 +393,6 @@ It can be implemented by applying the horizontal and vertical derivative filters
 Note the the magnitude calculation is non-linear; the individual derivative operations are linear filters.
 
 #### Laplacian
-
 The Laplacian measures the sum of second derivatives: 
 
 $\nabla^2 I = \frac{\partial^2 I}{\partial x^2}+\frac{\partial^2 I}{\partial y^2}$
@@ -441,21 +460,25 @@ out.r = out.b = out.g = imgf->getPixelValue(x,y) + 2.0f * (imgf->getPixelValue(x
 
 #### Benefits
 Laplacian:
+
 - It was extremely easy to implement, as simply running a kernel through the whole image was enough. It may only apply with intermediate calculations; however, that was exactly what was needed in this case.
 - It requires a reasonably low amount of operations per pixel, which makes it quite efficient.
 
 Unsharp:
+
 - The sharpening intensity can be controlled independently from the Gaussian blur, which can produce interesting results.
 - When parameters are chosen with caution, the results can be noticeably better than Laplacian for sharpening images. Personally, I noticed way less unneeded noise enhancement.
 - It was quite easy to understand, even if it did look a bit daunting at first.
 
 #### Drawbacks
 Laplacian:
+
 - I noticed a very high sensitivity to noise. It was almost jarring to see details that were not previously visible pop out of the dark.
 - The sharpening combined with sensitivity to noise commonly produced unnatural looking edges, which made the image look a lot more imperfect and poor quality than it actually was.
 - Since it only has one parameter which can be easily changed without changing the whole kernel, it can feel a bit rigid to modify.
 
 Unsharp:
+
 - Since it basically includes two separate operations at once, it is a lot more computationally intensive to process.
 - This method seems to create visible outlines that may look slightly out of place on high-contrast edges of objects.
 - I noticed that poorly chosen parameters may make the image look completely fake; however, I would attribute this fault to the user, not the algorithm itself.
@@ -463,7 +486,7 @@ Unsharp:
 ### Multistep image processing
 For this task, a separate function was implemented. In a later version, I would like to implement a multi-step processing tool which would allow you to apply multiple transformations back-to-back in the viewer itself, but, unfortunately, I did not have enough time to do that.
 
-The pipeline for this task is as follows: `Negation > Power-Law > Unsharp`. Since everything is modular, I simply plugged in the already defined functions into one chain in my new `multi()` function specifically made for this task. The process is equivalent to applying a new transformation to an already transformed image. In other words, the transformation are done one by one, each transforming the output of the previous funtion. 
+The pipeline for this task is as follows: `Negation > Power-Law > Unsharp`. Since everything is modular, I simply plugged in the already defined functions into one chain in my new `multi()` function specifically made for this task. The process is equivalent to applying a new transformation to an already transformed image. In other words, the transformations are done one by one, each transforming the output of the previous funtion. 
 
 The transformation function can be found in the *Spatial filtering* menu in the toolbar.
 
@@ -471,9 +494,12 @@ For the example, I used a γ value of 5. (See @fig-multi)
 
 ![Multi-step processing output.](ref/multi.png){#fig-multi}
 
+The images that are processed after each step are not displayed. The ouput is only the final result of this pipeline.
+
 ## Image Transformations
 
 ### Calculation of index-to-local and local-to-world transformations
+
 
 ### Composite affine transformations
 
