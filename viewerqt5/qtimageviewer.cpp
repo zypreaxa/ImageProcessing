@@ -514,20 +514,6 @@ void QtImageViewer::setCurrentImage(Image<uint8_t>* img){
 
 void QtImageViewer::clearFile(){};
 
-void QtImageViewer::togreyscale(){
-	ImageProcessor processor;
-
-	QString filename = QFileDialog::getOpenFileName(this, "Select image for conversion");
-	if(filename.isEmpty()){
-		return;
-	}
-	TiffLoader trloader(filename.toStdString());
-	Image<>* rgb = trloader.loadImage();
-	Image<>* gsc = processor.togreyscale(rgb);
-	showImageRight(gsc);
-	delete gsc;
-};
-
 void QtImageViewer::combineImagesRGB() {
     ImageProcessor processor;
 
@@ -581,6 +567,21 @@ void QtImageViewer::combineImagesRGB() {
 	delete rgb;
 };
 
+void QtImageViewer::togreyscale(){
+	ImageProcessor processor;
+
+	QString filename = QFileDialog::getOpenFileName(this, "Select image for conversion");
+	if(filename.isEmpty()){
+		return;
+	}
+	TiffLoader trloader(filename.toStdString());
+	Image<>* img = trloader.loadImage();
+	processor.togreyscale(img);
+	showImageRight(img);
+
+	delete img;
+};
+
 void QtImageViewer::negate() {
 	ImageProcessor processor;
 	QString filename = QFileDialog::getOpenFileName(this, "Select Image for transformation...");
@@ -591,6 +592,7 @@ void QtImageViewer::negate() {
 
 	processor.negationtr(img);
 	showImageRight(img);
+
 	delete img; // make this work somehow with qt getting ownership of the image. Maybe also merge functions somehow?
 };
 
