@@ -93,6 +93,7 @@ void QtImageViewer::init(){
     categories->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     categories->setFocusPolicy(Qt::NoFocus);
 
+	categories->addItem(tr("Images"));
     categories->addItem(tr("Transforms"));
     categories->addItem(tr("LUT"));
     categories->addItem(tr("Spatial"));
@@ -156,6 +157,10 @@ void QtImageViewer::init(){
         scroll->setWidget(content);
         operationPages->addWidget(scroll);
     };
+
+	addPage(tr("Images"), tr("Unedited images"),{
+		{tr("Open File Explorer"), _fileOpenAction}
+	});
 
     addPage(tr("Transforms"), tr("Basic intensity adjustments"), {
         {tr("Negation"), _trNegate},
@@ -353,34 +358,6 @@ void QtImageViewer::createActions(){
 	_spatialMulti = new QAction(tr("Multi transform..."), this);
 	_spatialMulti->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_M));
 	connect(_spatialMulti, SIGNAL(triggered()), this, SLOT(multi()));
-
-	_fileMenu = menuBar()->addMenu(tr("&File"));
-	_fileMenu->addAction(_fileOpenAction);
-	_fileMenu->addAction(_fileClearAction);
-	_fileMenu->addAction(_quitAction);
-
-	_trMenu = menuBar()->addMenu(tr("&Transforms"));
-	_trMenu->addAction(_trFourierTransform);
-	_trMenu->addAction(_trTogreyscale);
-	_trMenu->addAction(_trCombine);
-	_trMenu->addAction(_trNegate);
-	_trMenu->addAction(_trNegateLUT);
-	_trMenu->addAction(_trPowerlaw);
-	_trMenu->addAction(_trPowerlawLUT);
-	_trMenu->addAction(_trLinear);
-	_trMenu->addAction(_trLinearLUT);
-	_trMenu->addAction(_trThresholding);
-	_trMenu->addAction(_trThresholdingLUT);
-	_trMenu->addAction(_trHistogrameq);
-	
-	_spatialMenu = menuBar()->addMenu(tr("&Spatial filtering"));
-	_spatialMenu->addAction(_spatialLowpass);
-	_spatialMenu->addAction(_spatialMedian);
-	_spatialMenu->addAction(_spatialLaplacian);
-	_spatialMenu->addAction(_spatialUnsharp);
-	_spatialMenu->addAction(_spatialMulti);
-
-	_toolsMenu = menuBar()->addMenu(tr("&Tools"));
 };
 
 void QtImageViewer::openFile(){
@@ -732,10 +709,9 @@ void QtImageViewer::lowpass(){
 	TiffLoader trloader = (filename.toStdString());
 	Image<>* img = trloader.loadImage();
 
-	Image<>* filtered = processor.lowpass(img);
-	showImageRight(filtered);
+	processor.lowpass(img);
+	showImageRight(img);
 	delete img;
-	delete filtered;
 };
 void QtImageViewer::median(){
 	ImageProcessor processor;
@@ -745,10 +721,9 @@ void QtImageViewer::median(){
 	TiffLoader trloader = (filename.toStdString());
 	Image<>* img = trloader.loadImage();
 
-	Image<>* filtered = processor.median(img);
-	showImageRight(filtered);
+	processor.median(img);
+	showImageRight(img);
 	delete img;
-	delete filtered;
 };
 void QtImageViewer::laplacian(){
 	ImageProcessor processor;
@@ -758,10 +733,9 @@ void QtImageViewer::laplacian(){
 	TiffLoader trloader = (filename.toStdString());
 	Image<>* img = trloader.loadImage();
 
-	Image<>* filtered = processor.laplacian(img);
-	showImageRight(filtered);
+	processor.laplacian(img);
+	showImageRight(img);
 	delete img;
-	delete filtered;
 };
 void QtImageViewer::unsharp(){
 	ImageProcessor processor;
@@ -771,10 +745,9 @@ void QtImageViewer::unsharp(){
 	TiffLoader trloader = (filename.toStdString());
 	Image<>* img = trloader.loadImage();
 
-	Image<>* filtered = processor.unsharp(img);
-	showImageRight(filtered);
+	processor.unsharp(img);
+	showImageRight(img);
 	delete img;
-	delete filtered;
 };
 void QtImageViewer::multi(){
 	ImageProcessor processor;
@@ -784,10 +757,9 @@ void QtImageViewer::multi(){
 	TiffLoader trloader = (filename.toStdString());
 	Image<>* img = trloader.loadImage();
 
-	Image<>* filtered = processor.multi(img);
-	showImageRight(filtered);
+	processor.multi(img);
+	showImageRight(img);
 	delete img;
-	delete filtered;
 };
 
 void QtImageViewer::quit(){
