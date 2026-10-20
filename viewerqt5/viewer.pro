@@ -9,6 +9,9 @@ QT += widgets gui charts
 TARGET = viewer 
 LIBS+= -L../imagelib/ -limagelib -ltiff -Wl,-rpath,../imagelib
 
+QMAKE_CXXFLAGS += -fsanitize=address -fno-omit-frame-pointer -g -O0
+QMAKE_LFLAGS += -fsanitize=address
+
 HEADERS += qtimageviewer.hpp
 
 SOURCES += viewer.cpp \

@@ -15,7 +15,7 @@ CC            = gcc
 CXX           = g++
 DEFINES       = -DQT_NO_DEBUG -DQT_CHARTS_LIB -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB
 CFLAGS        = -pipe -O2 -D_REENTRANT -flto -fno-fat-lto-objects -Wall -Wextra -fPIC $(DEFINES)
-CXXFLAGS      = -pipe -O2 -std=gnu++11 -D_REENTRANT -flto -fno-fat-lto-objects -Wall -Wextra -fPIC $(DEFINES)
+CXXFLAGS      = -pipe -fsanitize=address -fno-omit-frame-pointer -g -O0 -O2 -std=gnu++11 -D_REENTRANT -flto -fno-fat-lto-objects -Wall -Wextra -fPIC $(DEFINES)
 INCPATH       = -I. -I. -I.. -I../imagelib -I/usr/include/qt -I/usr/include/qt/QtCharts -I/usr/include/qt/QtWidgets -I/usr/include/qt/QtGui -I/usr/include/qt/QtCore -Irelease -I/usr/lib/qt/mkspecs/linux-g++
 QMAKE         = /usr/bin/qmake
 DEL_FILE      = rm -f
@@ -38,7 +38,7 @@ COMPRESS      = gzip -9f
 DISTNAME      = viewer1.0.0
 DISTDIR = /home/zypreaxa/Projects/ImageProcessing/viewerqt5/release/viewer1.0.0
 LINK          = g++
-LFLAGS        = -Wl,-O1 -pipe -O2 -std=gnu++11 -flto=12 -fno-fat-lto-objects -fuse-linker-plugin -fPIC
+LFLAGS        = -Wl,-O1 -pipe -fsanitize=address -fno-omit-frame-pointer -g -O0 -O2 -std=gnu++11 -flto=12 -fno-fat-lto-objects -fuse-linker-plugin -fPIC
 LIBS          = $(SUBLIBS) -L../imagelib/ -limagelib -ltiff -Wl,-rpath,../imagelib /usr/lib/libQt5Charts.so /usr/lib/libQt5Widgets.so /usr/lib/libQt5Gui.so /usr/lib/libQt5Core.so -lGL -lpthread   
 AR            = gcc-ar cqs
 RANLIB        = 
@@ -218,7 +218,7 @@ compiler_moc_predefs_make_all: release/moc_predefs.h
 compiler_moc_predefs_clean:
 	-$(DEL_FILE) release/moc_predefs.h
 release/moc_predefs.h: /usr/lib/qt/mkspecs/features/data/dummy.cpp
-	g++ -pipe -O2 -std=gnu++11 -dM -E -o release/moc_predefs.h /usr/lib/qt/mkspecs/features/data/dummy.cpp
+	g++ -pipe -fsanitize=address -fno-omit-frame-pointer -g -O0 -O2 -std=gnu++11 -dM -E -o release/moc_predefs.h /usr/lib/qt/mkspecs/features/data/dummy.cpp
 
 compiler_moc_header_make_all: release/moc_qtimageviewer.cpp
 compiler_moc_header_clean:

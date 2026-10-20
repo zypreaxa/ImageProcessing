@@ -69,8 +69,8 @@ public:
 
     std::vector<unsigned int> getHistogram() const {
         std::vector<unsigned int> histogram(256, 0);
-        for (unsigned long y = 0; y < _height; ++y) {
-            for (unsigned long x = 0; x < _width; ++x) {
+        for (unsigned long y = 0; y < _height; y++) {
+            for (unsigned long x = 0; x < _width; x++) {
                 Pixel<uint8_t> p = getPixel(x, y);
                 histogram[p.r]++;
             }
