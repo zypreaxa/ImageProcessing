@@ -37,6 +37,8 @@ public:
 
     static Image<>* multi(Image<>* img);
 
+    static Image<>* dft(Image<>* img);
+
 private:
 // my compiler is ancient so had to make my own clamp lol
     template <class T = uint8_t>

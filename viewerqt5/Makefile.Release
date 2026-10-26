@@ -39,7 +39,7 @@ DISTNAME      = viewer1.0.0
 DISTDIR = /home/zypreaxa/Projects/ImageProcessing/viewerqt5/release/viewer1.0.0
 LINK          = g++
 LFLAGS        = -Wl,-O1 -pipe -fsanitize=address -fno-omit-frame-pointer -g -O0 -O2 -std=gnu++11 -flto=12 -fno-fat-lto-objects -fuse-linker-plugin -fPIC
-LIBS          = $(SUBLIBS) -L../imagelib/ -limagelib -ltiff -Wl,-rpath,../imagelib /usr/lib/libQt5Charts.so /usr/lib/libQt5Widgets.so /usr/lib/libQt5Gui.so /usr/lib/libQt5Core.so -lGL -lpthread   
+LIBS          = $(SUBLIBS) -L../imagelib/ -limagelib -ltiff -lfftw3f -Wl,-rpath,../imagelib /usr/lib/libQt5Charts.so /usr/lib/libQt5Widgets.so /usr/lib/libQt5Gui.so /usr/lib/libQt5Core.so -lGL -lpthread   
 AR            = gcc-ar cqs
 RANLIB        = 
 SED           = sed

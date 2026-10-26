@@ -185,6 +185,10 @@ void QtImageViewer::init(){
         {tr("Multistep processing"), _spatialMulti}
     });
 
+	addPage(tr("Fourier tasks"), tr("Smoothing and sharpening"), {
+		{tr("Fourier transformation"), _fourierdft}
+    });
+
     addPage(tr("Utilities"), tr("Image conversion and composition"), {
         {tr("Convert to grayscale"), _trTogreyscale},
         {tr("Combine RGB channels"), _trCombine}
@@ -358,6 +362,10 @@ void QtImageViewer::createActions(){
 	_spatialMulti = new QAction(tr("Multi transform..."), this);
 	_spatialMulti->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_M));
 	connect(_spatialMulti, SIGNAL(triggered()), this, SLOT(multi()));
+
+	_fourierdft = new QAction(tr("Fourier transform..."), this);
+	_fourierdft->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_M));
+	connect(_fourierdft, SIGNAL(triggered()), this, SLOT(dft()));
 };
 
 void QtImageViewer::openFile(){
@@ -762,6 +770,31 @@ void QtImageViewer::multi(){
 	processor.multi(img);
 	showImageRight(img);
 	delete img;
+};
+
+void QtImageViewer::dft(){
+    ImageProcessor processor;
+
+    QString filename = QFileDialog::getOpenFileName(
+        this, "Select image for Fourier transform..."
+    );
+
+    if(filename.isEmpty()) return;
+
+    TiffLoader trloader(filename.toStdString());
+
+    Image<>* img = trloader.loadImage();
+
+    if(!img) return;
+
+    Image<>* result = processor.dft(img);
+
+    if(result){
+        showImageRight(result);
+        delete result;
+    }
+
+    delete img;
 };
 
 void QtImageViewer::quit(){

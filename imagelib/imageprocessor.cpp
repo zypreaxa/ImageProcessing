@@ -2,6 +2,9 @@
 #include <algorithm>
 #include <cmath>
 #include <iostream>
+#include <fftw3.h>
+#include <cstdint>
+#include <climits>
 
 Image<>* ImageProcessor::combineRGB(
     Image<>* red,
@@ -449,7 +452,7 @@ Image<float>* ImageProcessor::toFloat(Image<uint8_t>* img8) {
 
     unsigned long floatBpc = 32;
     return new Image<float>(width, height, channels, floatBpc, dst);
-}
+};
 
 Image<uint8_t>* ImageProcessor::to8bit(Image<float>* imgf) {
     size_t width    = imgf->getWidth();
@@ -468,7 +471,7 @@ Image<uint8_t>* ImageProcessor::to8bit(Image<float>* imgf) {
 
     unsigned long outBpc = 8;
     return new Image<uint8_t>(width, height, channels, outBpc, dst);
-}
+};
 
 Image<uint8_t>* ImageProcessor::lowpass(Image<uint8_t>* img)
 {
@@ -534,7 +537,6 @@ float med (std::vector<float> neighborhood){
         return neighborhood[size / 2];
     }
 }; 
-
 
 Image<uint8_t>* ImageProcessor::median(Image<uint8_t>* img){
     size_t width = img->getWidth();
@@ -659,5 +661,150 @@ Image<>* ImageProcessor::multi(Image<>* img) {
     // Step 3: Unsharp masking
     Image<>* result = ImageProcessor::unsharp(img);
 
+    return result;
+};
+
+Image<>* ImageProcessor::dft(Image<>* img) {
+
+    if (!img) return nullptr;
+
+    size_t width = img->getWidth();
+    size_t height = img->getHeight();
+
+    if (img->getChannels() != 1) {
+        std::cerr << "Selected image is not greyscale.\n";
+        return nullptr;
+    }
+
+    if (width == 0 || height == 0 ||
+        width > INT_MAX / 2 || height > INT_MAX / 2) {
+        return nullptr;
+    }
+
+    size_t paddedWidth = width * 2;
+    size_t paddedHeight = height * 2;
+    size_t totalPixels = paddedWidth * paddedHeight;
+
+    // STEP 1: Padding and frequency centering
+
+    float* outbuff = new float[totalPixels]{};
+
+    Image<float>* outfloat = new Image<float>(
+        paddedWidth, paddedHeight, 1, 32, outbuff
+    );
+
+    for (size_t y = 0; y < paddedHeight; y++) {
+        for (size_t x = 0; x < paddedWidth; x++) {
+
+            float val = 0.0f;
+
+            if (y < height && x < width) {
+
+                val = static_cast<float>(
+                    img->getPixelValue(x, y)
+                );
+
+                if ((x + y) % 2 != 0)
+                    val = -val;
+            }
+
+            Pixel<float> out;
+            out.r = out.g = out.b = val;
+
+            outfloat->setPixel(x, y, out);
+        }
+    }
+
+    // STEP 2: Allocate FFTW complex buffers
+
+    fftwf_complex* fftInput =
+        fftwf_alloc_complex(totalPixels);
+
+    fftwf_complex* fftOutput =
+        fftwf_alloc_complex(totalPixels);
+
+    if (!fftInput || !fftOutput) {
+        fftwf_free(fftInput);
+        fftwf_free(fftOutput);
+        delete outfloat;
+        return nullptr;
+    }
+
+    // STEP 3: Copy padded image into FFTW input
+
+    float* data = outfloat->getImageData();
+
+    for (size_t i = 0; i < totalPixels; i++) {
+
+        fftInput[i][0] = data[i]; // Real component
+        fftInput[i][1] = 0.0f;    // Imaginary component
+    }
+
+    // STEP 4: Create and execute forward 2D FFT
+
+    fftwf_plan plan = fftwf_plan_dft_2d(static_cast<int>(paddedHeight),
+        static_cast<int>(paddedWidth),
+        fftInput,
+        fftOutput,
+        FFTW_FORWARD,
+        FFTW_ESTIMATE
+    );
+
+    if (!plan) {
+        fftwf_free(fftInput);
+        fftwf_free(fftOutput);
+        delete outfloat;
+        return nullptr;
+    }
+
+    fftwf_execute(plan);
+
+    // STEP 5: Find maximum logarithmic magnitude
+
+    float maxMagnitude = 0.0f;
+
+    for (size_t i = 0; i < totalPixels; i++) {
+
+        float real = fftOutput[i][0];
+        float imag = fftOutput[i][1];
+
+        float magnitude = std::hypot(real, imag);
+        float logMagnitude = std::log1p(magnitude);
+
+        if (logMagnitude > maxMagnitude)
+            maxMagnitude = logMagnitude;
+    }
+
+    // STEP 6: Convert magnitude spectrum to grayscale
+
+    uint8_t* visualBuffer = new uint8_t[totalPixels]{};
+
+    for (size_t i = 0; i < totalPixels; i++) {
+
+        float real = fftOutput[i][0];
+        float imag = fftOutput[i][1];
+
+        float magnitude = std::hypot(real, imag);
+        float logMagnitude = std::log1p(magnitude);
+
+        float normalized = 0.0f;
+
+        if (maxMagnitude > 0.0f)
+            normalized = 255.0f * logMagnitude / maxMagnitude;
+
+        visualBuffer[i] = static_cast<uint8_t>(normalized);
+    }
+
+    // STEP 7: Create displayable output image
+
+    Image<uint8_t>* result = new Image<uint8_t>(paddedWidth,paddedHeight,1,8,visualBuffer);
+
+    // STEP 8: Clean up
+
+    fftwf_destroy_plan(plan);
+    fftwf_free(fftInput);
+    fftwf_free(fftOutput);
+
+    delete outfloat;
     return result;
 }
